@@ -6,14 +6,20 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import yedam.game.skyhill.VO.EnemyVO;
 import yedam.game.skyhill.VO.FloorInfoVO;
 import yedam.game.skyhill.VO.UserVO;
+import yedam.game.skyhill.VO.leftfloorinfoVO;
+import yedam.game.skyhill.VO.rightfloorinfoVO;
 
 public class GameStartImpl implements GameStartService {
 
 	UserVO uservo = new UserVO();
 	FloorData fd = new FloorData(); // 층별 데이터 객체
 	static List<FloorInfoVO> floorlist = new ArrayList<FloorInfoVO>();
+	List<leftfloorinfoVO> leftfloorlist = new ArrayList<leftfloorinfoVO>();
+	List<rightfloorinfoVO> rightfloorlist = new ArrayList<rightfloorinfoVO>();
+	EnemyImpl enemy = new EnemyImpl();
 
 	// 스테이터스
 	@Override
@@ -53,26 +59,24 @@ public class GameStartImpl implements GameStartService {
 					floorlist = fd.FloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
 
 					for (int i = 0; i < floorlist.size(); i++) {
-						//방문 체크 이프문
+						// 방문 체크 이프문
 						if (floorlist.get(i).getCheckfloor().equals("0")) { // 방문한 적 없다면
 							floorlist.get(i).setCheckfloor("1"); // 방문 체크
 						}
-						//적 출현 메소드 작성 업데이트 쿼리
-						if(floorlist.get(i).getEnemyInCount().equals("0")) { //에너미카운터 0
-							//int ran = (int)(Math.random()*30)+1;
-							Random ran = new Random();
-							
-							if(ran.nextInt(10) < 3) {//30%확률
-								//업데이트 메소드 실행
-							}
-							
-						}
-						//아이템 메소드 작성
-						
-						//자판기or 엘리베이터 작성 
+						// 적 출현 메소드 작성 업데이트 쿼리
+						//if (floorlist.get(i).getEnemyInCount().equals("0")) { // 에너미카운터 0
+							// int ran = (int)(Math.random()*30)+1;
+						//	Random ran = new Random();
+						//	if (ran.nextInt(10) < 3) {// 30%확률 //에너미 인카운트 변경
+							//	enemy.enemyInCount(floorlist.get(i).getFloorNum());
+						//		System.out.println("적출현");
+						//	}
+
+						//}
+						// 아이템 메소드 작성
+
+						// 자판기or 엘리베이터 작성
 					}
-					
-					
 
 					progressMenu(); // 진행 실행
 				} else if (selectFloorMenu == 2) { // 장비제작
@@ -116,21 +120,82 @@ public class GameStartImpl implements GameStartService {
 
 			while (true) {
 				if (selectMenu == 1) { // 내려가기
-					staminaLogic();
+					staminaLogic(); // 스태미너 감소
 					uservo.set진행중플로어(uservo.get진행중플로어() - 1);
-					FloorData fd = new FloorData(); // 층별 데이터 객체
-					floorlist = fd.FloorInfo(uservo.get진행중플로어());
-					System.out.println("몇층?" + floorlist.get(1));
+					floorlist = fd.FloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
 
-					/*
-					 * if(floorinfovo.getCheckfloor().equals("0")) { //방문여부체크후
-					 * floorinfovo.setCheckfloor("1"); //값변경 }
-					 */
+					for (int i = 0; i < floorlist.size(); i++) {
+						// 적 출현 메소드 작성 업데이트 쿼리
+						if (floorlist.get(i).getCheckfloor().equals("0") //방문한 적 없고 
+								&&floorlist.get(i).getEnemyInCount().equals("0")) { // 에너미카운터 0
+							// int ran = (int)(Math.random()*30)+1;
+							Random ran = new Random();
+							if (ran.nextInt(10) < 3) {// 30%확률 //에너미 인카운트 변경
+								enemy.enemyInCount(floorlist.get(i).getFloorNum());
+								System.out.println("적 출현");
+								
+								if(uservo.get진행중플로어() / 10 == 9 || //90층대 80층대 70층대
+										uservo.get진행중플로어() / 10 == 8 ||
+										uservo.get진행중플로어() / 10 == 7 ) {
+									EnemyVO enemyvo = new EnemyVO("발탄",20,6,20,60);
+									BattleImpl battle = new BattleImpl();
+									battle.battleStart(enemyvo,uservo); //배틀 메소드 넘겨줌
+					
+								}
+							}
+							// 방문 체크 이프문
+						}
+						// 아이템 메소드 작성
 
+						// 자판기or 엘리베이터 작성
+						
+						if (floorlist.get(i).getCheckfloor().equals("0")) { // 방문한 적 없다면
+							floorlist.get(i).setCheckfloor("1"); // 방문 체크
+						}
+					}
+
+					
+					
+					
+					
+					
 					progressMenu();
 				} else if (selectMenu == 2) { // 왼쪽방 들어가기
-					staminaLogic();
-					// fd.FloorInfo(uservo.get진행중플로어()); //vo에 층별 아이템및에너미값 초기화
+					staminaLogic(); // 스태미너 감소
+					uservo.set진행중플로어(uservo.get진행중플로어() - 1);
+					leftfloorlist = fd.leftFloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
+
+					for (int i = 0; i < floorlist.size(); i++) {
+						// 적 출현 메소드 작성 업데이트 쿼리
+						if (leftfloorlist.get(i).getCheckfloor().equals("0") //방문한 적 없고 
+								&&leftfloorlist.get(i).getLeftEnemyInCount().equals("0")) { // 에너미카운터 0
+							// int ran = (int)(Math.random()*30)+1;
+							Random ran = new Random();
+							if (ran.nextInt(10) < 2) {// 30%확률 //에너미 인카운트 변경
+								enemy.enemyInCount(floorlist.get(i).getFloorNum());
+								System.out.println("적 출현");
+								
+								if(uservo.get진행중플로어() / 10 == 9 || //90층대 80층대 70층대
+										uservo.get진행중플로어() / 10 == 8 ||
+										uservo.get진행중플로어() / 10 == 7 ) {
+									EnemyVO enemyvo = new EnemyVO("발탄",20,6,20,60);
+									BattleImpl battle = new BattleImpl();
+									battle.battleStart(enemyvo,uservo); //배틀 메소드 넘겨줌
+					
+								}
+							}
+							
+						} else if(leftfloorlist.get(i).getCheckfloor().equals("0")//방문한적없고
+								&& leftfloorlist.get(i).getDropItems().equals("0")) {//아이템이 등장하지 않았다면
+							
+							
+						}
+						
+						if (floorlist.get(i).getCheckfloor().equals("0")) { // 방문한 적 없다면
+							floorlist.get(i).setCheckfloor("1"); // 방문 체크
+						}
+					}
+
 
 				} else if (selectMenu == 3) { // 오른쪽 방 들어가기
 					staminaLogic();
@@ -147,7 +212,8 @@ public class GameStartImpl implements GameStartService {
 
 				} else if (selectMenu == 5) { // 엘리베이터
 
-				} else if (selectMenu == 6) {
+				} else if (selectMenu == 6) { //스테이터스 확인
+					System.out.println("현재 스테이터스 확인");
 
 				} else if (selectMenu == 7) {
 

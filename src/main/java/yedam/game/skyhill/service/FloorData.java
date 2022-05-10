@@ -9,6 +9,7 @@ import java.util.List;
 
 import yedam.game.skyhill.DAO.DataSource;
 import yedam.game.skyhill.VO.FloorInfoVO;
+import yedam.game.skyhill.VO.leftfloorinfoVO;
 
 public class FloorData {
 	private DataSource dataSource = DataSource.getInstance();
@@ -46,7 +47,33 @@ public class FloorData {
 		return floorlist;
 	}
 	
-	
+	//플로어 조회 메소드 
+		public List<leftfloorinfoVO> leftFloorInfo(int floorNum) {
+			List<leftfloorinfoVO> floorlist = new ArrayList<leftfloorinfoVO>();
+
+
+			String sql = "SELECT * FROM leftfloorinfo WHERE floornum = ?";
+			System.out.println("넘겨받은 값 " + floorNum + " 층");
+			
+			try {
+				psmt = con.prepareStatement(sql);
+				psmt.setInt(1, floorNum);
+				rs = psmt.executeQuery();
+				while (rs.next()) {
+					
+					leftfloorinfoVO leftfloorVO = new leftfloorinfoVO();
+					//vo.setId(rs.getString("sId"));
+					leftfloorVO.setFloorNum(rs.getInt("floorNum"));//층번호
+					leftfloorVO.setDropItems(rs.getString("dropitems"));//아이템여부
+					leftfloorVO.setLeftEnemyInCount(rs.getString("leftenemyincount"));
+					leftfloorVO.setCheckfloor(rs.getString("checkfloor"));//입장여부
+					floorlist.add(leftfloorVO);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return floorlist;
+		}
 	
 
 }
