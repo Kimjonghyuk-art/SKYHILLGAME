@@ -53,13 +53,13 @@ public class FloorData {
 
 
 			String sql = "SELECT * FROM leftfloorinfo WHERE floornum = ?";
-			System.out.println("넘겨받은 값 " + floorNum + " 층");
+			System.out.println("왼쪽 방넘겨받은 값 " + floorNum + " 층");
 			
 			try {
 				psmt = con.prepareStatement(sql);
 				psmt.setInt(1, floorNum);
 				rs = psmt.executeQuery();
-				while (rs.next()) {
+				if (rs.next()) {
 					
 					leftfloorinfoVO leftfloorVO = new leftfloorinfoVO();
 					//vo.setId(rs.getString("sId"));
@@ -75,5 +75,20 @@ public class FloorData {
 			return floorlist;
 		}
 	
-
+		//플로어 방문 여부 체크 메소드 
+		public int checkFloor(int floorNum) {
+			int result = 0;
+			String sql = "UPDATE floorinfo SET checkfloor = 1 WHERE floornum = ?";
+			
+			try {
+				psmt = con.prepareStatement(sql);
+				psmt.setInt(1, floorNum);
+				result = psmt.executeUpdate();
+			} catch(SQLException e) {
+				e.printStackTrace();
+			}
+			
+			return result;
+			
+		}
 }

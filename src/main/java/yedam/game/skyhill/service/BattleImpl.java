@@ -51,11 +51,14 @@ public class BattleImpl implements Battle {
 			}
 		}
 		
-		System.out.println("\t\t\t\t"+enemyvo.get이름()+"(이)가 죽었습니다.");
-		System.out.println("\t\t\t\t\t"+enemyvo.get경험치()+"exp획득");
+		System.out.println("\t\t\t\t\t"+enemyvo.get이름()+"(이)가 죽었습니다.");
+		System.out.println("\t\t\t\t\t"+enemyvo.get경험치()+"   exp획득");
 		System.out.println();
 		//획득 경험치 저장
 		uservo.set경험치(uservo.get경험치()+enemyvo.get경험치());
+		System.out.println("\t\t\t\t\t 현재 경험치 : " + uservo.get경험치()+"exp");
+		System.out.println("\t\t\t\t\t 레벨업 필요 경험치 : "+levelUpExp);
+		System.out.println();
 		//레벨업 필요 경험치보다 많다면 
 		if(uservo.get경험치() > levelUpExp) {
 			uservo.set경험치(uservo.get경험치()-levelUpExp); //경험치 초기화 
