@@ -148,5 +148,25 @@ public class FloorData {
 			}
 			return result;
 		}
-	
+
+		
+		public int elevatorCheckUpdate(int RanfloorNum) {
+			int result = 0;
+			String sql = "UPDATE floorinfo SET elevator = 1 WHERE floornum = ?";
+
+			try {
+				psmt = con.prepareStatement(sql);
+				psmt.setInt(1, RanfloorNum);
+				result = psmt.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			return result;
+
+		}
+		
+		
+		
+		
 }

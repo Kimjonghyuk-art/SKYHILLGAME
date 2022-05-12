@@ -130,8 +130,10 @@ public class GameStartImpl implements GameStartService {
 					staminaLogic(); // 스태미너 감소
 					uservo.set진행중플로어(uservo.get진행중플로어() - 1);
 					floorlist = fd.FloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
-					// 적 생성 메소드 실행
-					CreateEnemy(floorlist);
+					// 방문 한 적 없으면 생성 메소드 실행
+					if(floorlist.get(0).getCheckfloor().equals("0")) {
+						CreateEnemy(floorlist);
+					}
 
 					if (fd.checkFloor(floorlist.get(0).getFloorNum()) == 0) {
 						fd.checkFloor(floorlist.get(0).getFloorNum());// 방문 체크
@@ -143,8 +145,13 @@ public class GameStartImpl implements GameStartService {
 					staminaLogic(); // 스태미너 감소
 					// uservo.set진행중플로어(uservo.get진행중플로어());
 					leftfloorlist = fd.leftFloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
-
-					leftfloormenu(leftfloorlist);
+					
+					if(leftfloorlist.get(0).getCheckfloor().equals("0")){ //플로어체크가 0이면
+						leftfloormenu(leftfloorlist);
+					} else if(leftfloorlist.get(0).getCheckfloor().equals("1")) {
+						System.out.println("이미 입장한 방입니다.");
+					}
+					
 
 					progressMenu();
 				} else if (selectMenu == 3) { // 오른쪽 방 들어가기
@@ -491,6 +498,11 @@ public class GameStartImpl implements GameStartService {
 						BattleImpl battle = new BattleImpl();
 						battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
+					} else if(uservo.get진행중플로어() / 10 == 6 ||
+							uservo.get진행중플로어() / 10 == 5) {
+						EnemyVO enemyvo = new EnemyVO("졸병",25,4,15,60);
+						BattleImpl battle = new BattleImpl();
+						battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 					}
 				}
 			}

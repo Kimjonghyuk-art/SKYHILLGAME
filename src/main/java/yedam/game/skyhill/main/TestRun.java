@@ -11,9 +11,10 @@ public class TestRun {
 	Scanner sc = new Scanner(System.in);
 	GameStartService Gamestart = new GameStartImpl();
 	FloorData fd = new FloorData();
-	UserImpl ul = new UserImpl();
+	//UserImpl ul = new UserImpl();
 	
 	public void run() {
+		
 		test();
 	}
 	
@@ -31,6 +32,53 @@ public class TestRun {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		 
+		for(int i = 99; i > 1; i -= 10) {
+			int ran = (int) ((Math.random()*4)+1);
+			System.out.println("받은 랜덤 숫자 > "+ran);
+			int a[] = new int[ran];
+			for(int j = 0; j < ran; j++) {
+				int ranFloorNum = (int) (Math.random() * 9) + 1;
+				int tenNumber = ((i/10)*10) + ranFloorNum;
+				a[j] = tenNumber;
+				for(int k = 0; k < j; k++) {
+					if(a[k] == a[j]) {
+						j--;
+					}
+				}
+			}
+			for(int q = 0; q < a.length; q++) {
+				System.out.println(a[q]);
+			}
+		}
+		for (int i = 99; i > 1; i -= 10) {
+			int ran = (int) (Math.random() * 4) + 1;
+			//System.out.println("Ran " + ran);
+			int a[] = new int[ran];
+			for (int j = 0; j < ran; j++) {
+				int floor = (int) (Math.random() * 9) + 1;
+				int ten = ((i / 10) * 10) + floor;
+				//System.out.println(ten);
+				a[j] = ten;
+				for (int k = 0; k < j; k++) {
+					if (a[j] == a[k]) {
+						j--;
+					}
+				}
+
+			}
+			for (int aa : a) {
+				System.out.println("a no: " + aa);
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
 		System.out.println("=========================");
 		System.out.println("=========SKYHILL=========");
 		System.out.println("=========================");
