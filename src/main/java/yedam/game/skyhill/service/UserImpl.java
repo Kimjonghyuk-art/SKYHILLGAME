@@ -19,12 +19,11 @@ public class UserImpl implements User {
 	private ResultSet rs;
 	
 	@Override
-	public int InsertFood(int randomNum) { //음식 추가 메소드 
+	public int Insertitems(int randomNum,String tablename) { //아이템 추가 메소드 
 		int result = 0;
-		
 		String sql = "INSERT INTO inventory (ccode,itemcode,name,effect,grade)"
 				+ " SELECT ccode,itemcode,name,effect,grade"
-				+ " FROM foods WHERE itemcode = ?";
+				+ " FROM " + tablename +" WHERE itemcode = ?";
 		
 		try {
 			psmt = con.prepareStatement(sql);
@@ -37,6 +36,9 @@ public class UserImpl implements User {
 		return result;
 
 	}
+	
+	
+	
 	@Override
 	public int InsertMeterial(MaterialVO meterfialvo) {
 		// TODO Auto-generated method stub
@@ -65,6 +67,7 @@ public class UserImpl implements User {
 				inventoryvo.setGrade(rs.getString("grade"));
 				inventoryvo.setCount(rs.getInt("count"));
 				
+				
 				inventorylist.add(inventoryvo);
 			}
 		} catch (SQLException e) {
@@ -73,15 +76,17 @@ public class UserImpl implements User {
 		return inventorylist;
 	}
 	@Override
-	public int inventoryUpdateFood(int randonNum) {
+	public int inventoryUpdateitems(int randonNum, int ccode) {
 		
-		int result = 0;
-		String sql = "UPDATE inventory SET count = count+1 WHERE itemcode=?";
+		int result = -1;
+		String sql = "UPDATE inventory SET count = count+1 WHERE itemcode=? AND ccode = ?";
 		
 		try {
 			psmt = con.prepareStatement(sql);
 			psmt.setInt(1, randonNum);
+			psmt.setInt(2, ccode);
 			result = psmt.executeUpdate();
+			System.out.println("result >" + result);
 		} catch(SQLException e) {
 			e.printStackTrace();
 		}
@@ -89,8 +94,80 @@ public class UserImpl implements User {
 		return result;
 		
 	}
+	@Override
+	public int deleteitems(String name,int ccode) {
+		int result = -1;
+		String sql = "DELETE FROM inventory WHERE name ='"+name+"'";
+		
+		try {
+			psmt = con.prepareStatement(sql);
+			//psmt.setString(1, "'"+name+"'");
+			result = psmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
+
+	//응급 도구 추가 메소드 
+	@Override
+	public int insertKitItems(int randomNum) {
+		int result = 0;
+		System.out.println("응급 아이템 인덱스 >"+randomNum);
+		String sql = "INSERT INTO inventory (ccode,itemcode,name,effect,grade)"
+				+ " SELECT ccode,itemcode,name,effect,grade"
+				+ " FROM kititems WHERE itemcode = ?";
+		
+		try {
+			psmt = con.prepareStatement(sql);
+			psmt.setInt(1, randomNum);
+			result = psmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+
+	}
+
+	@Override
+	public int minousCountitems(String name, int ccode) {
+		int result = -1;
+		String sql = "UPDATE inventory SET count = count-1 WHERE name="+"'"+name+"'"+"AND ccode = ?";
+		
+		try {
+			psmt = con.prepareStatement(sql);
+			psmt.setInt(1, ccode);
+			
+			result = psmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
+
+	public int deleteAllInventory() {
+		int result = 0;
 	
+		String sql = "DELETE FROM inventory";
+		try {
+			psmt = con.prepareStatement(sql);
+			result = psmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+		
+		
+	}
 	
+
+
+
 	
 	
 	

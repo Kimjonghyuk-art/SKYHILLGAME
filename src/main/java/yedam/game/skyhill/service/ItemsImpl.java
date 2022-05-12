@@ -10,6 +10,7 @@ import java.util.List;
 import yedam.game.skyhill.DAO.DataSource;
 import yedam.game.skyhill.VO.FloorInfoVO;
 import yedam.game.skyhill.VO.FoodsVO;
+import yedam.game.skyhill.VO.KitItemsVO;
 
 public class ItemsImpl implements Items {
 
@@ -48,6 +49,37 @@ public class ItemsImpl implements Items {
 			e.printStackTrace();
 		}
 		return foodslist;
+	}
+
+	@Override
+	public List<KitItemsVO> getKitItems() {
+		List<KitItemsVO> kititemlist = new ArrayList<KitItemsVO>();
+
+		String sql = "SELECT * FROM kititems";
+		
+		try {
+			psmt = con.prepareStatement(sql);
+			rs = psmt.executeQuery();
+			while (rs.next()) {
+				
+				KitItemsVO kititemvo = new KitItemsVO();
+				//vo.setId(rs.getString("sId"));
+				//foodsvo.setCcode(rs.getInt("ccode"));
+				kititemvo.setCcode(rs.getInt("ccode"));
+				kititemvo.setItemcode(rs.getInt("itemcode"));
+				kititemvo.setName(rs.getString("name"));
+				kititemvo.setEffect(rs.getInt("effect"));
+				kititemvo.setGrade(rs.getString("grade"));
+				kititemvo.setMaterial(rs.getInt("material"));
+				kititemvo.setMaterial2(rs.getInt("material2"));
+				kititemvo.setFkccode(rs.getInt("fkccode"));
+				kititemvo.setFkccode2(rs.getInt("fkccode2"));
+				kititemlist.add(kititemvo);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return kititemlist;
 	}
 	
 	

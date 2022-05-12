@@ -8,8 +8,15 @@ import yedam.game.skyhill.VO.MaterialVO;
 public interface User {
 
 	
-	public int InsertFood(int randomNum); //음식 추가 메소드
+	public int Insertitems(int randomNum,String tablename); //음식 추가 메소드
 	public int InsertMeterial(MaterialVO meterfialvo); //재료 추가 메소드
 	public List<InventoryVO> selectInventory();//인벤토리 전체 조회 메소드 
-	public int inventoryUpdateFood(int randonNum);
+	public int inventoryUpdateitems(int randonNum,int ccode); //인벤토리 카운터 증가
+	public int deleteitems(String name,int ccode); // 음식 삭제
+	public int minousCountitems(String name,int ccode); // 인벤토리 카운트 감소  
+	
+	
+	public int insertKitItems(int randomNum); //응급도구 추가 메소드
+	
+	
 }

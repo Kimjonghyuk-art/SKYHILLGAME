@@ -11,5 +11,4 @@ public class InventoryVO {
 	int effect;
 	String grade;
 	int count;
-	
 }
