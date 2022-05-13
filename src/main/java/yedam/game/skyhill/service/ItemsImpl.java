@@ -11,6 +11,7 @@ import yedam.game.skyhill.DAO.DataSource;
 import yedam.game.skyhill.VO.FloorInfoVO;
 import yedam.game.skyhill.VO.FoodsVO;
 import yedam.game.skyhill.VO.KitItemsVO;
+import yedam.game.skyhill.VO.WeaponVO;
 
 public class ItemsImpl implements Items {
 
@@ -80,6 +81,37 @@ public class ItemsImpl implements Items {
 			e.printStackTrace();
 		}
 		return kititemlist;
+	}
+
+	@Override
+	public List<WeaponVO> getWeapons() {
+		List<WeaponVO> weaponlist = new ArrayList<WeaponVO>();
+
+		String sql = "SELECT * FROM weapons";
+		
+		try {
+			psmt = con.prepareStatement(sql);
+			rs = psmt.executeQuery();
+			while (rs.next()) {
+				
+				WeaponVO weaponvo = new WeaponVO();
+				//vo.setId(rs.getString("sId"));
+				//foodsvo.setCcode(rs.getInt("ccode"));
+				weaponvo.setCcode(rs.getInt("ccode"));
+				weaponvo.setItemcode(rs.getInt("itemcode"));
+				weaponvo.setName(rs.getString("name"));
+				weaponvo.setEffect(rs.getInt("effect"));
+				weaponvo.setDex(rs.getInt("dex"));
+				weaponvo.setStr(rs.getInt("str"));
+				weaponvo.setSpd(rs.getInt("spd"));
+				weaponvo.setGrade(rs.getString("grade"));
+				weaponvo.setUsecheck(rs.getNString("usecheck"));
+				weaponlist.add(weaponvo);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return weaponlist;
 	}
 	
 	

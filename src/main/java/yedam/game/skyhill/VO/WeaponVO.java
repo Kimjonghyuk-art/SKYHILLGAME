@@ -5,8 +5,14 @@ import lombok.Data;
 @Data
 public class WeaponVO {
 
-	String 이름;
-	String 데미지;
-	String 재료;
+	int ccode;
+	int itemcode;
+	String name;
+	int effect;
+	int dex;
+	int str;
+	int spd;
+	String grade;
+	String usecheck;
 	
 }

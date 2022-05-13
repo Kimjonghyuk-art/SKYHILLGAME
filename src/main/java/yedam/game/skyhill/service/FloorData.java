@@ -165,8 +165,60 @@ public class FloorData {
 			return result;
 
 		}
+		public int clearElevator() {
+			int result = 0;
+			String sql = "UPDATE floorinfo SET elevator = 0";
+
+			try {
+				psmt = con.prepareStatement(sql);
+				result = psmt.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			return result;
+
+		}
 		
-		
-		
+		public int updateElevator(int floorNum) {
+			int result = 0;
+			String sql = "UPDATE floorinfo SET elevator = 1 WHERE floornum = ?";
+
+			try {
+				psmt = con.prepareStatement(sql);
+				psmt.setInt(1, floorNum);
+				result = psmt.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			return result;
+
+		}
+
+		public List<FloorInfoVO> selectElevator() {
+			List<FloorInfoVO> floorlist = new ArrayList<FloorInfoVO>();
+
+			String sql = "SELECT * FROM floorinfo WHERE elevator = 1";
+			try {
+				psmt = con.prepareStatement(sql);
+				rs = psmt.executeQuery();
+				while (rs.next()) {
+
+					FloorInfoVO floorinfovo = new FloorInfoVO();
+					// vo.setId(rs.getString("sId"));
+					floorinfovo.setFloorNum(rs.getInt("floornum"));
+					floorinfovo.setEnemyInCount(rs.getString("enemyincount"));
+					floorinfovo.setVendingMachine(rs.getString("vendingmachine"));
+					floorinfovo.setElevator(rs.getString("elevator"));
+					floorinfovo.setCheckfloor(rs.getString("checkfloor"));
+					floorlist.add(floorinfovo);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return floorlist;
+			
+		}
 		
 }

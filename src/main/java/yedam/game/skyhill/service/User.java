@@ -17,6 +17,6 @@ public interface User {
 	
 	
 	public int insertKitItems(int randomNum); //응급도구 추가 메소드
-	
+	public List<InventoryVO> inventoryWeaponSelect();
 	
 }

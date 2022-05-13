@@ -11,6 +11,7 @@ import yedam.game.skyhill.DAO.DataSource;
 import yedam.game.skyhill.VO.FoodsVO;
 import yedam.game.skyhill.VO.InventoryVO;
 import yedam.game.skyhill.VO.MaterialVO;
+import yedam.game.skyhill.VO.WeaponVO;
 
 public class UserImpl implements User {
 	private DataSource dataSource = DataSource.getInstance();
@@ -83,10 +84,9 @@ public class UserImpl implements User {
 		
 		try {
 			psmt = con.prepareStatement(sql);
-			psmt.setInt(1, randonNum);
+			psmt.setInt(1, randonNum+1);
 			psmt.setInt(2, ccode);
 			result = psmt.executeUpdate();
-			System.out.println("result >" + result);
 		} catch(SQLException e) {
 			e.printStackTrace();
 		}
@@ -163,6 +163,46 @@ public class UserImpl implements User {
 		return result;
 		
 		
+	}
+
+
+
+	@Override
+	public List<InventoryVO> inventoryWeaponSelect() {
+		
+		List<InventoryVO> inventorylist = new ArrayList<InventoryVO>();
+		
+		String sql = "SELECT i.ccode,i.itemcode,i.grade,i.count,i.name,w.effect,w.dex,w.str,w.spd,w.usecheck "
+				+ "FROM (select * from inventory WHERE inventory.ccode = 1) i "
+				+ " LEFT JOIN weapons w "
+				+ " ON(i.ccode = w.ccode AND i.itemcode = w.itemcode)";
+	
+		try {
+			psmt = con.prepareStatement(sql);
+			
+			rs = psmt.executeQuery();
+			while (rs.next()) {
+				WeaponVO weaponvo = new WeaponVO();
+				// vo.setId(rs.getString("sId"));
+				weaponvo.setEffect(rs.getInt("effect"));
+				weaponvo.setDex(rs.getInt("dex"));
+				weaponvo.setStr(rs.getInt("str"));
+				weaponvo.setSpd(rs.getInt("psd"));
+				weaponvo.setUsecheck(rs.getString("usecheck"));
+				
+				InventoryVO inventoryvo = new InventoryVO(weaponvo,rs.getInt("ccode"),rs.getInt("itemcode"),
+						rs.getString("name"),rs.getInt("effect"),rs.getString("grade"),
+						rs.getInt("count"));
+						
+				inventorylist.add(inventoryvo);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		return inventorylist;
 	}
 	
 
