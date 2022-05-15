@@ -19,6 +19,7 @@ import yedam.game.skyhill.VO.rightfloorinfoVO;
 public class GameStartImpl implements GameStartService {
 
 	UserVO uservo = new UserVO();
+	WeaponVO weaponvo = new WeaponVO();
 	FloorData fd = new FloorData(); // 층별 데이터 객체
 	ItemsImpl items = new ItemsImpl();
 	UserImpl userimpl = new UserImpl();
@@ -30,6 +31,7 @@ public class GameStartImpl implements GameStartService {
 	List<InventoryVO> inventorylist = new ArrayList<InventoryVO>();
 	List<KitItemsVO> kititemslist = new ArrayList<KitItemsVO>();
 	List<WeaponVO> weaponlist = new ArrayList<WeaponVO>();
+
 	// 컬럼 초기화 메소드
 	@Override
 	public void clearColumn() {
@@ -37,6 +39,7 @@ public class GameStartImpl implements GameStartService {
 		fd.leftFloorCheckClear();
 		fd.rightFloorCheckClear();
 		userimpl.deleteAllInventory();
+		userimpl.AllWeaponsUpdate0();
 
 		System.out.println("컬럼초기화");
 	}
@@ -97,7 +100,7 @@ public class GameStartImpl implements GameStartService {
 		System.out.println();
 		System.out.println();
 		System.out.println();
-		System.out.println("1.내려가기 2.장비제작 3.음식제작 4.업그레이드 5.수면 6.현재 스테이터스 확인 7.현재 진행상황 보기");
+		System.out.println("1.내려가기 2.수면 3.현재 스테이터스 확인 4.현재 진행상황 보기");
 		System.out.print("선택 >>");
 		try {
 			int selectFloorMenu = sc.nextInt();
@@ -113,18 +116,12 @@ public class GameStartImpl implements GameStartService {
 					// 자판기or 엘리베이터 작성
 
 					progressMenu(); // 진행 실행
-				} else if (selectFloorMenu == 2) { // 장비제작
+				} else if (selectFloorMenu == 2) { // 수면
 
-				} else if (selectFloorMenu == 3) { // 음식제작
-
-				} else if (selectFloorMenu == 4) { // 업그레이드
-
-				} else if (selectFloorMenu == 5) { // 수면제작
-
-				} else if (selectFloorMenu == 6) { // 현재스테이터스
-
-				} else if (selectFloorMenu == 7) { // 현재 진행상황보기
-
+				} else if (selectFloorMenu == 3) { // 스테이터스
+					getUserStatus(uservo);
+				} else if (selectFloorMenu == 4) { //진행상황 보기 
+					
 				}
 			}
 
@@ -135,6 +132,46 @@ public class GameStartImpl implements GameStartService {
 			selectFloorMenu();
 		}
 
+	}
+
+	private void getUserStatus(UserVO uservo) {
+		int usingCheckIndex = -1;
+		boolean usingCheck = false;
+		
+		inventorylist = userimpl.inventoryWeaponSelect(); //조인한 결과 값담은 리스트
+		
+		//착용중인 장비가 있다면 착용중인 장비 인덱스값 저장 
+		for (int i = 0; i < inventorylist.size(); i++) {
+			System.out.println("ccode > "+inventorylist.get(i).getCcode());
+			System.out.println("usercheck >"+inventorylist.get(i).getWeaponvo().getUsecheck());
+			if(inventorylist.get(i).getWeaponvo().getUsecheck().equals("1")) {
+				usingCheckIndex = i;
+				usingCheck = true;
+			}
+		}
+		System.out.println("┌───────────────────────────────────────┐");
+		System.out.println("                user info              ");
+		if(usingCheck) { //착용중 장비가 있다면
+		System.out.printf("  착용중 장비 : %s                        ",inventorylist.get(usingCheckIndex).getName());	
+		} else if (!usingCheck) {
+		System.out.printf("  착용중 장비 : 없음                       ");
+		}
+		System.out.println();
+		System.out.printf("  현재 공격력 > %s                          ",uservo.get공격력());
+		System.out.println();
+		System.out.printf("  Str > %s                           ",uservo.get강도());
+		System.out.println();
+		System.out.printf("  Spd > %s                           ",uservo.get속도());
+		System.out.println();
+		System.out.printf("  Dex > %s                           ",uservo.get민첩());
+		System.out.println();
+		System.out.printf("  Accuracy > %s                      ",uservo.get명중());
+		System.out.println();
+		System.out.printf("  어빌리티포인트 > %d                      ",uservo.get어빌리티포인트());
+		System.out.println();
+		System.out.println("└───────────────────────────────────────┘");
+		
+		selectFloorMenu();
 	}
 
 	// 해당 층에 방문확인 체크
@@ -172,13 +209,13 @@ public class GameStartImpl implements GameStartService {
 
 					progressMenu();
 				} else if (selectMenu == 2) { // 왼쪽방 들어가기
-					
+
 					staminaLogic(); // 스태미너 감소
 					// uservo.set진행중플로어(uservo.get진행중플로어());
 					leftfloorlist = fd.leftFloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
 
 					if (leftfloorlist.get(0).getCheckfloor().equals("0")) { // 플로어체크가 0이면
-					
+
 						leftfloormenu(leftfloorlist);
 					} else if (leftfloorlist.get(0).getCheckfloor().equals("1")) {
 						System.out.println("이미 입장한 방입니다.");
@@ -205,35 +242,35 @@ public class GameStartImpl implements GameStartService {
 					 * for(int i = 0; i < floorlist.size(); i++ ) {
 					 * System.out.println("엘리베이터 생성 층 > " + floorlist.get(i).getFloorNum()); }
 					 */
-					//int a[] = new int[floorlist.size()];
+					// int a[] = new int[floorlist.size()];
 					boolean checkelevator = false;
-					for(FloorInfoVO vo : floorlist) {
-						if(vo.getFloorNum() == uservo.get진행중플로어()) {
+					for (FloorInfoVO vo : floorlist) {
+						if (vo.getFloorNum() == uservo.get진행중플로어()) {
 							checkelevator = true;
 							break;
 						}
 					}
-					for(FloorInfoVO vo : floorlist) {
-						if(vo.getFloorNum() >= uservo.get마지막플로어()) {
+					for (FloorInfoVO vo : floorlist) {
+						if (vo.getFloorNum() >= uservo.get마지막플로어()) {
 							System.out.println("이용가능한 층 >" + vo.getFloorNum());
 						}
 					}
-					
-					if(checkelevator) {
+
+					if (checkelevator) {
 						System.out.println("엘리베이터 이용 가능한 플로어입니다.");
 						System.out.print("이동할 층 선택 >");
 						int select = sc.nextInt();
-						if(select < uservo.get마지막플로어()) {
+						if (select < uservo.get마지막플로어()) {
 							System.out.println("이동 불가능한 층");
 						} else {
 							uservo.set진행중플로어(select);
 							progressMenu();
 						}
-						
+
 					} else {
 						System.out.println("엘리베이터가 부서져있다.");
 					}
-					
+
 					progressMenu();
 				} else if (selectMenu == 6) { // 인벤토리 확인
 					System.out.println("현재 인벤토리 확인");
@@ -257,11 +294,51 @@ public class GameStartImpl implements GameStartService {
 	private void inventorymenu() {
 		Scanner sc = new Scanner(System.in);
 		inventorylist = userimpl.selectInventory();
+		System.out.println("┌────────────────────────────────────────────────────────────┐");
+		System.out.println("\t\t\t 무        기            ");
+		System.out.println("이름\t\t공격력\t\t등급\t\t소지 개수 ");
 		for (int i = 0; i < inventorylist.size(); i++) {
-			System.out.println(inventorylist.get(i).toString());
+			if(inventorylist.get(i).getCcode() == 1) {
+				System.out.print(inventorylist.get(i).getName()+"\t\t  ");
+				System.out.print(inventorylist.get(i).getEffect()+"\t\t ");
+				System.out.print(inventorylist.get(i).getGrade()+"\t\t   ");
+				System.out.println(inventorylist.get(i).getCount()+"\t\t  ");
+			}
 		}
-
-		System.out.println("1.뒤로가기 2.아이템사용 3.장비보기");
+		System.out.println("└────────────────────────────────────────────────────────────┘");
+		
+		System.out.println("┌────────────────────────────────────────────────────────────┐");
+		System.out.println("\t\t\t 음        식            ");
+		System.out.println("이름\t\t회복량\t\t등급\t\t소지 개수 ");
+		for (int i = 0; i < inventorylist.size(); i++) {
+			if(inventorylist.get(i).getCcode() == 3) {
+				System.out.print(inventorylist.get(i).getName()+"\t\t  ");
+				System.out.print(inventorylist.get(i).getEffect()+"\t\t ");
+				System.out.print(inventorylist.get(i).getGrade()+"\t\t   ");
+				System.out.println(inventorylist.get(i).getCount()+"\t\t  ");
+			}
+		}
+		System.out.println("└────────────────────────────────────────────────────────────┘");
+		
+		System.out.println("┌────────────────────────────────────────────────────────────┐");
+		System.out.println("\t\t\t 응   급   도  구          ");
+		System.out.println("이름\t\t회복량\t\t등급\t\t소지 개수 ");
+		for (int i = 0; i < inventorylist.size(); i++) {
+			if(inventorylist.get(i).getCcode() == 4) {
+				if(inventorylist.get(i).getName().length() > 4) {
+					System.out.print(inventorylist.get(i).getName()+"\t  ");
+				} else {
+					System.out.print(inventorylist.get(i).getName()+"\t\t  ");
+					
+				}
+				System.out.print(inventorylist.get(i).getEffect()+"\t\t ");
+				System.out.print(inventorylist.get(i).getGrade()+"\t\t   ");
+				System.out.println(inventorylist.get(i).getCount()+"\t\t  ");
+			}
+		}
+		
+		System.out.println("└────────────────────────────────────────────────────────────┘");
+		System.out.println("1.뒤로가기 2.아이템사용 3.장비착용");
 		System.out.print("선택 >");
 		int inventoryMenu = sc.nextInt();
 
@@ -271,15 +348,74 @@ public class GameStartImpl implements GameStartService {
 			} else if (inventoryMenu == 2) { // 아이템사용
 				selectinventoryitem(inventorylist);
 				inventorymenu();
-			} else if (inventoryMenu == 3) { //장비 보기
-				/*
-				 * userimpl.inventoryWeaponSelect(); for(int i = 0; i <
-				 * userimpl.inventoryWeaponSelect().size(); i++) {
-				 * System.out.println(userimpl.inventoryWeaponSelect().get(i).toString()); }
-				 * inventorymenu();
-				 */
+			} else if (inventoryMenu == 3) { // 장비착용
+				int usingCheckIndex = -1;
+				boolean usingCheck = false;
+				
+				inventorylist = userimpl.inventoryWeaponSelect(); //조인한 결과 값담은 리스트
+				
+				//착용중인 장비가 있다면 착용중인 장비 인덱스값 저장 
+				for (int i = 0; i < inventorylist.size(); i++) {
+					System.out.println("ccode > "+inventorylist.get(i).getCcode());
+					System.out.println("usercheck >"+inventorylist.get(i).getWeaponvo().getUsecheck());
+					if(inventorylist.get(i).getWeaponvo().getUsecheck().equals("1")) {
+						usingCheckIndex = i;
+						usingCheck = true;
+					}
+				}
+
+				if(usingCheck) { //사용중인 장비가 있다면
+					
+					System.out.println("현재 착용중인 장비 > " + inventorylist.get(usingCheckIndex).getName());
+					System.out.print("착용할 장비 선택 >");
+					String selectEquipment = sc.next();
+					
+					for(int i = 0; i < inventorylist.size(); i ++) {
+						
+						if(inventorylist.get(i).getName().equals(selectEquipment)) { //입력받은 장비 있는지 비교
+							System.out.println("현재 공격력 : " + uservo.get공격력());
+							uservo.set공격력(uservo.get공격력()-inventorylist.get(usingCheckIndex).getEffect());
+							uservo.set공격력(uservo.get공격력()+inventorylist.get(i).getEffect());
+							System.out.println("착용 후 공격력 : " + uservo.get공격력());
+							userimpl.useUpdateWeapon(inventorylist.get(usingCheckIndex).getName(),0);//착용해제
+							userimpl.useUpdateWeapon(inventorylist.get(i).getName(),1);//사용체크
+							break;
+						} else if(!inventorylist.get(i).getName().equals(selectEquipment)) {
+							System.out.println(selectEquipment+"(이)가 없습니다.");
+						}
+							
+					}
+					
+				} else if(!usingCheck) { //사용중인 장비가 없다면
+					
+					System.out.print("착용할 장비 선택 >");
+					String selectEquipment = sc.next(); 
+					
+					for (int i = 0; i < inventorylist.size(); i++) {
+						 
+						if(inventorylist.get(i).getName().equals(selectEquipment)) { //입력받은 장비가 있는지 비교
+							System.out.println("현재 공격력"+uservo.get공격력());
+							uservo.set공격력(uservo.get공격력()+inventorylist.get(i).getWeaponvo().getEffect());
+							System.out.println("착용 후 공격력 "+uservo.get공격력());
+							userimpl.useUpdateWeapon(inventorylist.get(i).getName(),1);//사용체크
+							break;
+						} else if(!inventorylist.get(i).getName().equals(selectEquipment)) {
+							System.out.println(selectEquipment+"(이)가 없습니다.");
+						}
+							
+						}
+				}
+				
+				
+				
+				
+				//weaponvo = userimpl.currentUsedWeapon(); //현재 착용중인 장비 가지고오기 
+			
+				
+				
+				inventorymenu();
 			}
-		}
+		}//반복문 종료 
 
 	}
 
@@ -288,7 +424,7 @@ public class GameStartImpl implements GameStartService {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("사용 할 아이템 선택 > ");
 		String selectitem = sc.next();
-		
+
 		for (int i = 0; i < inventorylist.size(); i++) {
 			if (inventorylist.get(i).getName().equals(selectitem) && // 이름이같고
 					inventorylist.get(i).getCount() > 1) { // 카운트가 1초과면
@@ -320,15 +456,6 @@ public class GameStartImpl implements GameStartService {
 	// 왼쪽방 메뉴
 	private void leftfloormenu(List<leftfloorinfoVO> leftfloorlist) {
 		Scanner sc = new Scanner(System.in);
-		
-		int itemcount = (int) ((Math.random() * 3) + 1);
-		if (leftfloorlist.get(0).getCheckfloor().equals("0")) {
-			// 적 생성 메소드 실행
-			// CreateEnemyleft(leftfloorlist);
-				dropitems();
-			
-		}
-		
 		System.out.println("┌──────────────────────────────┐");
 		System.out.println("│                              │");
 		System.out.println("│  Left Room                   │");
@@ -338,6 +465,15 @@ public class GameStartImpl implements GameStartService {
 		System.out.println("│                              │");
 		System.out.println("│                              │");
 		System.out.println("└──────────────────────────────┘");
+
+		int itemcount = (int) ((Math.random() * 3) + 1);
+		if (leftfloorlist.get(0).getCheckfloor().equals("0")) {
+			// 적 생성 메소드 실행
+			// CreateEnemyleft(leftfloorlist);
+			dropitems();
+
+		}
+
 
 		System.out.println("현재 방 > 왼쪽 방");
 		System.out.println("1.밖으로 나가기");
@@ -363,9 +499,9 @@ public class GameStartImpl implements GameStartService {
 		Random ran = new Random();
 		foodlist = getFoods(); // 모든 음식정보 담은 리스트
 		kititemslist = items.getKitItems(); // 모든 응급도구 정보
-		weaponlist = items.getWeapons(); // 모든 무기 정보 
+		weaponlist = items.getWeapons(); // 모든 무기 정보
 		inventorylist = userimpl.selectInventory(); // 검색한 인벤토리리스트 담아줌
-		
+
 		String kititems = "kititems";
 		String foods = "foods";
 		String weapons = "weapons";
@@ -375,11 +511,10 @@ public class GameStartImpl implements GameStartService {
 		// boolean foodcheck = false;
 		Arandom = (int) ((Math.random() * foodlist.size()));
 		int itemcode = Arandom;
-		System.out.println("푸드"+itemcode);
 		if (foodlist.get(itemcode).getGrade().equals("C")) {
 			// System.out.println("1."+itemcode);
 			if (ran.nextInt(100) < 95) {// 30%확률
-				if (check(itemcode, foodlist.get(itemcode).getCcode())) { // 기존에 있따면
+				if (check(itemcode, foodlist.get(itemcode).getCcode(), inventorylist)) { // 기존에 있따면
 					int update = userimpl.inventoryUpdateitems(itemcode, foodlist.get(itemcode).getCcode());
 
 					if (update != 0) {
@@ -393,7 +528,7 @@ public class GameStartImpl implements GameStartService {
 						System.out.println("1.");
 						System.out.println("업데이트를 실패하셨습니다.");
 					}
-				} else if (!check(itemcode, foodlist.get(itemcode).getCcode())) {
+				} else if (!check(itemcode, foodlist.get(itemcode).getCcode(), inventorylist)) {
 					userimpl.Insertitems(itemcode, foods);
 					for (int i = 0; i < foodlist.size(); i++) {
 						if (foodlist.get(i).getItemcode() == Arandom) {
@@ -405,7 +540,7 @@ public class GameStartImpl implements GameStartService {
 			}
 		} else if (foodlist.get(itemcode).getGrade().equals("B")) {
 			if (ran.nextInt(100) < 95) {// 30%확률
-				if (check(itemcode, foodlist.get(itemcode).getCcode())) { // 기존인벤토리에 있따면
+				if (check(itemcode, foodlist.get(itemcode).getCcode(), inventorylist)) { // 기존인벤토리에 있따면
 					int update = userimpl.inventoryUpdateitems(itemcode, foodlist.get(itemcode).getCcode());
 
 					if (update != 0) {
@@ -419,7 +554,7 @@ public class GameStartImpl implements GameStartService {
 						System.out.println("2.");
 						System.out.println("업데이트를 실패하셨습니다.");
 					}
-				} else if (!check(itemcode, foodlist.get(itemcode).getCcode())) {
+				} else if (!check(itemcode, foodlist.get(itemcode).getCcode(), inventorylist)) {
 					userimpl.Insertitems(itemcode, foods);
 					for (int i = 0; i < foodlist.size(); i++) {
 						if (foodlist.get(i).getItemcode() == Arandom) {
@@ -431,7 +566,7 @@ public class GameStartImpl implements GameStartService {
 			}
 		} else if (foodlist.get(itemcode).getGrade().equals("A")) {
 			if (ran.nextInt(100) < 95) {// 30%확률
-				if (check(itemcode, foodlist.get(itemcode).getCcode())) {
+				if (check(itemcode, foodlist.get(itemcode).getCcode(), inventorylist)) {
 					int update = userimpl.inventoryUpdateitems(itemcode, foodlist.get(itemcode).getCcode());
 
 					if (update != 0) {
@@ -445,7 +580,7 @@ public class GameStartImpl implements GameStartService {
 						System.out.println("3.");
 						System.out.println("업데이트를 실패하셨습니다.");
 					}
-				} else if (!check(itemcode, foodlist.get(itemcode).getCcode())) {
+				} else if (!check(itemcode, foodlist.get(itemcode).getCcode(), inventorylist)) {
 					userimpl.Insertitems(itemcode, foods);
 					for (int i = 0; i < foodlist.size(); i++) {
 						if (foodlist.get(i).getItemcode() == Arandom) {
@@ -465,11 +600,11 @@ public class GameStartImpl implements GameStartService {
 		Arandom = (int) ((Math.random() * kititemslist.size()));
 
 		itemcode = Arandom;
-		System.out.println("킷" + itemcode);
+
 		if (kititemslist.get(itemcode).getGrade().equals("C")) {
 			// System.out.println("1."+itemcode);
 			if (ran.nextInt(100) < 95) {// 30%확률
-				if (check(itemcode, kititemslist.get(itemcode).getCcode())) {
+				if (check(itemcode, kititemslist.get(itemcode).getCcode(), inventorylist)) {
 					int update = userimpl.inventoryUpdateitems(itemcode, kititemslist.get(itemcode).getCcode());
 
 					if (update != 0) {
@@ -482,7 +617,7 @@ public class GameStartImpl implements GameStartService {
 					} else if (update == 0) {
 						System.out.println("업데이트를 실패하셨습니다.");
 					}
-				} else if (!check(itemcode, kititemslist.get(itemcode).getCcode())) {
+				} else if (!check(itemcode, kititemslist.get(itemcode).getCcode(), inventorylist)) {
 					userimpl.Insertitems(itemcode, kititems);
 					for (int i = 0; i < kititemslist.size(); i++) {
 						if (kititemslist.get(i).getItemcode() == Arandom) {
@@ -494,7 +629,7 @@ public class GameStartImpl implements GameStartService {
 			}
 		} else if (kititemslist.get(itemcode).getGrade().equals("B")) {
 			if (ran.nextInt(100) < 95) {// 30%확률
-				if (check(itemcode, kititemslist.get(itemcode).getCcode())) {
+				if (check(itemcode, kititemslist.get(itemcode).getCcode(), inventorylist)) {
 					int update = userimpl.inventoryUpdateitems(itemcode, kititemslist.get(itemcode).getCcode());
 
 					if (update != 0) {
@@ -506,9 +641,10 @@ public class GameStartImpl implements GameStartService {
 						}
 					} else if (update == 0) {
 						System.out.println("5.");
+						System.out.println("아이템이름 > " + kititemslist.get(itemcode).getName());
 						System.out.println("업데이트를 실패하셨습니다.");
 					}
-				} else if (!check(itemcode, kititemslist.get(itemcode).getCcode())) {
+				} else if (!check(itemcode, kititemslist.get(itemcode).getCcode(), inventorylist)) {
 					userimpl.Insertitems(itemcode, kititems);
 					for (int i = 0; i < kititemslist.size(); i++) {
 						if (kititemslist.get(i).getItemcode() == Arandom) {
@@ -520,7 +656,7 @@ public class GameStartImpl implements GameStartService {
 			}
 		} else if (kititemslist.get(itemcode).getGrade().equals("A")) {
 			if (ran.nextInt(100) < 95) {// 30%확률
-				if (check(itemcode, kititemslist.get(itemcode).getCcode())) {
+				if (check(itemcode, kititemslist.get(itemcode).getCcode(), inventorylist)) {
 					int update = userimpl.inventoryUpdateitems(itemcode, kititemslist.get(itemcode).getCcode());
 
 					if (update != 0) {
@@ -534,7 +670,7 @@ public class GameStartImpl implements GameStartService {
 						System.out.println("6.");
 						System.out.println("업데이트를 실패하셨습니다.");
 					}
-				} else if (!check(itemcode, kititemslist.get(itemcode).getCcode())) {
+				} else if (!check(itemcode, kititemslist.get(itemcode).getCcode(), inventorylist)) {
 					userimpl.Insertitems(itemcode, kititems);
 					for (int i = 0; i < kititemslist.size(); i++) {
 						if (kititemslist.get(i).getItemcode() == Arandom) {
@@ -548,39 +684,38 @@ public class GameStartImpl implements GameStartService {
 			}
 		}
 
-			// 무기 테이블의 수만큼 랜덤 수 생성
-				Arandom = 0;
-				Arandom = (int) ((Math.random() * weaponlist.size()));
-				itemcode = Arandom;
-				System.out.println("무기 >" + itemcode);
-				if (weaponlist.get(itemcode).getGrade().equals("C")) {
-					// System.out.println("1."+itemcode);
-					if (ran.nextInt(100) < 95) {// 30%확률
-						if (check(itemcode, weaponlist.get(itemcode).getCcode())) {
-							int update = userimpl.inventoryUpdateitems(itemcode, weaponlist.get(itemcode).getCcode());
+		// 무기 테이블의 수만큼 랜덤 수 생성
+		Arandom = 0;
+		Arandom = (int) ((Math.random() * weaponlist.size()));
+		itemcode = Arandom;
+		if (weaponlist.get(itemcode).getGrade().equals("C")) {
+			// System.out.println("1."+itemcode);
+			if (ran.nextInt(100) < 95) {// 30%확률
+				if (check(itemcode, weaponlist.get(itemcode).getCcode(), inventorylist)) {
+					int update = userimpl.inventoryUpdateitems(itemcode, weaponlist.get(itemcode).getCcode());
 
-							if (update != 0) {
-								for (int i = 0; i < weaponlist.size(); i++) {
-									if (weaponlist.get(i).getItemcode() == Arandom) {
-										System.out.println(" >" + weaponlist.get(i).getName() + "+1 추가");
-										// System.out.println("들어온 랜덤 아이템 코드 >" + foodlist.get(i).getItemcode());
-									}
-								}
-							} else if (update == 0) {
-								System.out.println("업데이트를 실패하셨습니다.");
+					if (update != 0) {
+						for (int i = 0; i < weaponlist.size(); i++) {
+							if (weaponlist.get(i).getItemcode() == Arandom) {
+								System.out.println(" >" + weaponlist.get(i).getName() + "+1 추가");
+								// System.out.println("들어온 랜덤 아이템 코드 >" + foodlist.get(i).getItemcode());
 							}
-						} else if (!check(itemcode, weaponlist.get(itemcode).getCcode())) {
-							userimpl.Insertitems(itemcode, weapons);
-							for (int i = 0; i < weaponlist.size(); i++) {
-								if (weaponlist.get(i).getItemcode() == Arandom) {
-									System.out.println(">" + weaponlist.get(i).getName() + "+1 획득");
-									// System.out.println("들어온 랜덤 아이템 코드 >" + foodlist.get(i).getItemcode());
-								}
-							}
+						}
+					} else if (update == 0) {
+						System.out.println("업데이트를 실패하셨습니다.");
+					}
+				} else if (!check(itemcode, weaponlist.get(itemcode).getCcode(), inventorylist)) {
+					userimpl.Insertitems(itemcode, weapons);
+					for (int i = 0; i < weaponlist.size(); i++) {
+						if (weaponlist.get(i).getItemcode() == Arandom) {
+							System.out.println(">" + weaponlist.get(i).getName() + "+1 획득");
+							// System.out.println("들어온 랜덤 아이템 코드 >" + foodlist.get(i).getItemcode());
 						}
 					}
 				}
-				System.out.println("드랍 끗!");
+			}
+		}
+
 	}
 
 	// 음식 목록 전체 조회
@@ -657,14 +792,19 @@ public class GameStartImpl implements GameStartService {
 		} else if (uservo.get스태미너() < 0) { // 스태미너가 0보다 작다면 체력 -2감소
 			uservo.set스태미너(0);
 			uservo.set체력(uservo.get체력() - 2);
+			if(uservo.get체력() < 0) {
+				System.out.println("\t\t\t\t You Die!!");
+				System.exit(0);
+			}
 		}
 
 	}
 
-	public boolean check(int itemcode, int ccode) {
+	public boolean check(int itemcode, int ccode, List<InventoryVO> inventorylist2) {
 		boolean foodcheck = false;
-		for (int i = 0; i < inventorylist.size(); i++) {
-			if (inventorylist.get(i).getItemcode() == (itemcode) && inventorylist.get(i).getCcode() == (ccode)) {
+		//System.out.println("인벤토리리스트 사이즈 > " + inventorylist2.size());
+		for (int i = 0; i < inventorylist2.size(); i++) {
+			if (inventorylist2.get(i).getItemcode() == (itemcode) && inventorylist2.get(i).getCcode() == (ccode)) {
 
 				foodcheck = true;
 				break;

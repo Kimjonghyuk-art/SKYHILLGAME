@@ -4,6 +4,7 @@ import java.util.List;
 
 import yedam.game.skyhill.VO.InventoryVO;
 import yedam.game.skyhill.VO.MaterialVO;
+import yedam.game.skyhill.VO.WeaponVO;
 
 public interface User {
 
@@ -17,6 +18,7 @@ public interface User {
 	
 	
 	public int insertKitItems(int randomNum); //응급도구 추가 메소드
-	public List<InventoryVO> inventoryWeaponSelect();
-	
+	public List<InventoryVO> inventoryWeaponSelect(); //인벤토리내의 무기 정보 리스트
+	public int useUpdateWeapon(String name,int usecheck);//장비 착용 여부 업데이트
+	public WeaponVO currentUsedWeapon();
 }

@@ -81,10 +81,10 @@ public class UserImpl implements User {
 		
 		int result = -1;
 		String sql = "UPDATE inventory SET count = count+1 WHERE itemcode=? AND ccode = ?";
-		
+		System.out.println("넘겨받은 번호 > " + randonNum);
 		try {
 			psmt = con.prepareStatement(sql);
-			psmt.setInt(1, randonNum+1);
+			psmt.setInt(1, randonNum);
 			psmt.setInt(2, ccode);
 			result = psmt.executeUpdate();
 		} catch(SQLException e) {
@@ -161,11 +161,21 @@ public class UserImpl implements User {
 			e.printStackTrace();
 		}
 		return result;
-		
-		
 	}
 
-
+	public int AllWeaponsUpdate0() {
+		int result = 0;
+		String sql = "UPDATE weapons SET usecheck = 0";
+		
+		try {
+			psmt = con.prepareStatement(sql);
+			result = psmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
 
 	@Override
 	public List<InventoryVO> inventoryWeaponSelect() {
@@ -187,7 +197,7 @@ public class UserImpl implements User {
 				weaponvo.setEffect(rs.getInt("effect"));
 				weaponvo.setDex(rs.getInt("dex"));
 				weaponvo.setStr(rs.getInt("str"));
-				weaponvo.setSpd(rs.getInt("psd"));
+				weaponvo.setSpd(rs.getInt("spd"));
 				weaponvo.setUsecheck(rs.getString("usecheck"));
 				
 				InventoryVO inventoryvo = new InventoryVO(weaponvo,rs.getInt("ccode"),rs.getInt("itemcode"),
@@ -203,6 +213,56 @@ public class UserImpl implements User {
 		
 		
 		return inventorylist;
+	}
+
+
+
+	@Override
+	public int useUpdateWeapon(String name,int usecheck) {
+		int result = -1;
+		String sql = "UPDATE weapons SET usecheck = ? WHERE name = "+"'"+name+"'";
+		try {
+			psmt = con.prepareStatement(sql);
+			psmt.setInt(1, usecheck);
+			result = psmt.executeUpdate();
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+
+
+	@Override
+	public WeaponVO currentUsedWeapon() {
+
+		String sql = "SELECT * FROM weapons WHERE usecheck = 1";
+		
+		WeaponVO weaponvo = new WeaponVO();
+		try {
+			psmt = con.prepareStatement(sql);
+			rs = psmt.executeQuery();
+			if (rs.next()) {
+				
+				
+				weaponvo.setCcode(rs.getInt("ccode"));
+				weaponvo.setItemcode(rs.getInt("itemcode"));
+				weaponvo.setName(rs.getString("name"));
+				weaponvo.setEffect(rs.getInt("effect"));
+				weaponvo.setDex(rs.getInt("dex"));;
+				weaponvo.setStr(rs.getInt("str"));
+				weaponvo.setSpd(rs.getInt("spd"));
+				weaponvo.setGrade(rs.getString("grade"));
+				weaponvo.setUsecheck(rs.getString("usecheck"));
+				
+				
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return weaponvo;
 	}
 	
 
