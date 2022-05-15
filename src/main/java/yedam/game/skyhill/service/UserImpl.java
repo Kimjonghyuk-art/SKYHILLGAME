@@ -81,7 +81,6 @@ public class UserImpl implements User {
 		
 		int result = -1;
 		String sql = "UPDATE inventory SET count = count+1 WHERE itemcode=? AND ccode = ?";
-		System.out.println("넘겨받은 번호 > " + randonNum);
 		try {
 			psmt = con.prepareStatement(sql);
 			psmt.setInt(1, randonNum);

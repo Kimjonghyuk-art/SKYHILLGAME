@@ -10,6 +10,7 @@ import java.util.List;
 import yedam.game.skyhill.DAO.DataSource;
 import yedam.game.skyhill.VO.FloorInfoVO;
 import yedam.game.skyhill.VO.leftfloorinfoVO;
+import yedam.game.skyhill.VO.rightfloorinfoVO;
 
 public class FloorData {
 	private DataSource dataSource = DataSource.getInstance();
@@ -24,7 +25,7 @@ public class FloorData {
 		FloorInfoVO floorVO = new FloorInfoVO();
 
 		String sql = "SELECT * FROM floorinfo WHERE floornum = ?";
-		System.out.println("넘겨받은 값 " + floorNum + " 층");
+		
 
 		try {
 			psmt = con.prepareStatement(sql);
@@ -52,7 +53,7 @@ public class FloorData {
 		List<leftfloorinfoVO> floorlist = new ArrayList<leftfloorinfoVO>();
 
 		String sql = "SELECT * FROM leftfloorinfo WHERE floornum = ?";
-		System.out.println("왼쪽 방넘겨받은 값 " + floorNum + " 층");
+		
 
 		try {
 			psmt = con.prepareStatement(sql);
@@ -73,7 +74,34 @@ public class FloorData {
 		}
 		return floorlist;
 	}
+	//오른쪽 방 플로어 조회 메소드 
+	public List<rightfloorinfoVO> rightFloorInfo(int floorNum) {
+		List<rightfloorinfoVO> floorlist = new ArrayList<rightfloorinfoVO>();
 
+		String sql = "SELECT * FROM rightfloorinfo WHERE floornum = ?";
+
+		try {
+			psmt = con.prepareStatement(sql);
+			psmt.setInt(1, floorNum);
+			rs = psmt.executeQuery();
+			if (rs.next()) {
+
+				rightfloorinfoVO rightfloorvo = new rightfloorinfoVO();
+				// vo.setId(rs.getString("sId"));
+				rightfloorvo.setFloorNum(rs.getInt("floorNum"));// 층번호
+				rightfloorvo.setDropItems(rs.getString("dropitems"));// 아이템여부
+				rightfloorvo.setRightEnemyInCount(rs.getString("rightenemyincount"));
+				rightfloorvo.setCheckfloor(rs.getString("checkfloor"));// 입장여부
+				floorlist.add(rightfloorvo);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return floorlist;
+
+	}
+	
+	
 	// 플로어 방문 여부 체크 메소드
 	public int checkFloor(int floorNum) {
 		int result = 0;
@@ -107,6 +135,25 @@ public class FloorData {
 		return result;
 
 	}
+	//오른쪽방 방문 여부 체크 메소드 
+	public int rightCheckFloor(int floorNum) {
+		int result = 0;
+		String sql = "UPDATE rightfloorinfo SET checkfloor = 1 WHERE floornum = ?";
+
+		try {
+			psmt = con.prepareStatement(sql);
+			psmt.setInt(1, floorNum);
+			result = psmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+
+		
+	}
+	
+	
 
 	//실행 시 테이블 초기화 메소드 
 	public int floorCheckClear() {
@@ -220,5 +267,9 @@ public class FloorData {
 			return floorlist;
 			
 		}
+
+		
+
+		
 		
 }
