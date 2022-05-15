@@ -35,17 +35,17 @@ public class BattleImpl implements Battle {
 			System.out.printf("\t\t\t데미지: %.1f ~ %.1f  데미지 : %.1f ~ %.1f 데미지 : %.1f ~ %.1f", (최소데미지 * 0.7),
 					(최소데미지 * 1.49), (기본데미지 * 0.7), (기본데미지 * 1.49), (최대데미지 * 0.7), (최대데미지 * 1.49));
 			System.out.println();
-			System.out.printf("\t\t\t      확률  %.1f         확률 %.1f          확률 %.1f ", 최대명중률, 기본명중률, 최소명중률);
+			System.out.printf("\t\t\t      확률  %.1f         확률 %.1f          확률 %.1f ", 최대명중률-enemyvo.get회피율(), 기본명중률-enemyvo.get회피율(), 최소명중률-enemyvo.get회피율());
 			System.out.println();
 			System.out.println("\t\t\t\t\t  선택 >");
 			int select = sc.nextInt();
 			int count = 0;
 			if (select == 1) {
-				attack(최소보정데미지, 최대명중률, enemyvo, uservo, count, select);
+				attack(최소보정데미지, 최대명중률-enemyvo.get회피율(), enemyvo, uservo, count, select);
 			} else if (select == 2) {
-				attack(기본보정데미지, 기본명중률, enemyvo, uservo, count, select);
+				attack(기본보정데미지, 기본명중률-enemyvo.get회피율(), enemyvo, uservo, count, select);
 			} else if (select == 3) {
-				attack(최대보정데미지, 최대명중률, enemyvo, uservo, count, select);
+				attack(최대보정데미지, 최대명중률-enemyvo.get회피율(), enemyvo, uservo, count, select);
 			} else {
 				System.out.println("잘못된 값 입력했슈");
 			}
@@ -98,9 +98,7 @@ public class BattleImpl implements Battle {
 
 			}
 
-			System.out.println();
 			if (ran.nextInt(100) < (uservo.get속도() * 2) && count == 0) { // 추가공격 확률
-				System.out.println();
 				System.out.println("\t\t\t\t\t추가공격!!");
 				System.out.println();
 				count += 1;
@@ -126,17 +124,19 @@ public class BattleImpl implements Battle {
 
 	private void enemyAttack(EnemyVO enemyvo, UserVO uservo) {
 		Random ran = new Random();
+		double 데미지보정률 = ((ran.nextDouble() + 0.7));
+		double 보정데미지 = (enemyvo.get공격력())*데미지보정률;
 		if (enemyvo.get체력() > 0) {
 			if (ran.nextInt(100) < enemyvo.get명중률() - uservo.get회피율()) {
-				System.out.println("\t\t\t\t" + enemyvo.get이름() + "(이) 가" + enemyvo.get공격력() + "의 데미지" + "로 공격함");
+				System.out.printf("\t\t\t\t%s(이)가 %.1f 의 데미지로 공격!\n",enemyvo.get이름(),보정데미지);
 				System.out.println();
-				uservo.set체력(uservo.get체력() - enemyvo.get공격력());
+				uservo.set체력(uservo.get체력() - 보정데미지);
 				if (uservo.get체력() < 0) {
 					System.out.println("\t\t\t\t You Die!!");
 					System.exit(0);
 				}
 			} else {
-				System.out.println("\t\t\t\t" + enemyvo.get이름() + "(이) 가 공격 실패!");
+				System.out.println("\t\t\t\t" + enemyvo.get이름() + " !감나빗");
 				System.out.println();
 			}
 		}

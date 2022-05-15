@@ -80,7 +80,7 @@ public class GameStartImpl implements GameStartService {
 		System.out.println("\t\t\t\t\t ─────────────");
 		System.out.println("\t\t\t\t\t  현재 층 : " + uservo.get진행중플로어());
 		System.out.println("\t\t\t\t\t ─────────────");
-		System.out.println("\t\t\t\t\t\t\t\t 체력 : " + uservo.get체력());
+		System.out.printf("\t\t\t\t\t\t\t\t 체력 : %.1f\n " , uservo.get체력());
 		System.out.println("\t\t\t\t\t\t\t\t 스태미너 : " + uservo.get스태미너());
 		System.out.println();
 		System.out.println();
@@ -284,11 +284,11 @@ public class GameStartImpl implements GameStartService {
 					progressMenu();
 				} else if (selectMenu == 2) { // 왼쪽방 들어가기
 
-					staminaLogic(); // 스태미너 감소
+					
 					leftfloorlist = fd.leftFloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
 
 					if (leftfloorlist.get(0).getCheckfloor().equals("0")) { // 플로어체크가 0이면
-
+						staminaLogic(); // 스태미너 감소
 						leftfloormenu(leftfloorlist);
 					} else if (leftfloorlist.get(0).getCheckfloor().equals("1")) {
 						System.out.println("이미 입장한 방입니다.");
@@ -296,10 +296,11 @@ public class GameStartImpl implements GameStartService {
 
 					progressMenu();
 				} else if (selectMenu == 3) { // 오른쪽 방 들어가기
-					staminaLogic();
+					
 					rightfloorlist = fd.rightFloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
 					
 					if(rightfloorlist.get(0).getCheckfloor().equals("0")) {
+						staminaLogic();
 						rightfloormenu(rightfloorlist);
 					}else if (rightfloorlist.get(0).getCheckfloor().equals("1")) {
 						System.out.println("이미 입장한 방입니다.");
@@ -893,12 +894,12 @@ public class GameStartImpl implements GameStartService {
 					if (uservo.get진행중플로어() / 10 == 9 || // 90층대 80층대 70층대
 							uservo.get진행중플로어() / 10 == 8 || uservo.get진행중플로어() / 10 == 7) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 20, 6, 20, 60);
+							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 20, 6, 20, 60,10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("졸병", 25, 7, 25, 65);
+							EnemyVO enemyvo = new EnemyVO("졸병", 25, 7, 25, 65,10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -907,12 +908,12 @@ public class GameStartImpl implements GameStartService {
 					} else if(uservo.get진행중플로어() / 10 == 6 || uservo.get진행중플로어() / 10 == 5 ||
 							uservo.get진행중플로어() / 10 == 4) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("포효자", 40, 10, 45, 70);
+							EnemyVO enemyvo = new EnemyVO("포효자", 40, 10, 45, 70,15);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 50, 80);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 50, 80,19);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -920,12 +921,12 @@ public class GameStartImpl implements GameStartService {
 					} else if(uservo.get진행중플로어() / 10 == 3 || uservo.get진행중플로어() / 10 == 2 ||
 							uservo.get진행중플로어() / 10 == 1 ) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("시너", 80, 15, 100, 90);
+							EnemyVO enemyvo = new EnemyVO("시너", 80, 15, 100, 90,24);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 90, 16, 100, 90);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 90, 16, 100, 90,30);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -954,12 +955,12 @@ public class GameStartImpl implements GameStartService {
 					if (uservo.get진행중플로어() / 10 == 9 || // 90층대 80층대 70층대
 							uservo.get진행중플로어() / 10 == 8 || uservo.get진행중플로어() / 10 == 7) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 20, 6, 20, 60);
+							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 20, 6, 20, 60,10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("졸병", 25, 7, 25, 65);
+							EnemyVO enemyvo = new EnemyVO("졸병", 25, 7, 25, 65,10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -968,12 +969,12 @@ public class GameStartImpl implements GameStartService {
 					} else if(uservo.get진행중플로어() / 10 == 6 || uservo.get진행중플로어() / 10 == 5 ||
 							uservo.get진행중플로어() / 10 == 4) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("포효자", 40, 10, 45, 70);
+							EnemyVO enemyvo = new EnemyVO("포효자", 40, 10, 45, 70,15);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 50, 80);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 50, 80,19);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -981,12 +982,12 @@ public class GameStartImpl implements GameStartService {
 					} else if(uservo.get진행중플로어() / 10 == 3 || uservo.get진행중플로어() / 10 == 2 ||
 							uservo.get진행중플로어() / 10 == 1 ) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("시너", 80, 15, 100, 90);
+							EnemyVO enemyvo = new EnemyVO("시너", 80, 15, 100, 90,24);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 90, 16, 100, 90);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 90, 16, 100, 90,30);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -1020,12 +1021,12 @@ public class GameStartImpl implements GameStartService {
 					if (uservo.get진행중플로어() / 10 == 9 || // 90층대 80층대 70층대
 							uservo.get진행중플로어() / 10 == 8 || uservo.get진행중플로어() / 10 == 7) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 20, 6, 20, 60);
+							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 20, 6, 20, 60,10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("졸병", 25, 7, 25, 65);
+							EnemyVO enemyvo = new EnemyVO("졸병", 25, 7, 25, 65,10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -1034,12 +1035,12 @@ public class GameStartImpl implements GameStartService {
 					} else if(uservo.get진행중플로어() / 10 == 6 || uservo.get진행중플로어() / 10 == 5 ||
 							uservo.get진행중플로어() / 10 == 4) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("포효자", 40, 10, 45, 70);
+							EnemyVO enemyvo = new EnemyVO("포효자", 40, 10, 45, 70,15);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 50, 80);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 50, 80,19);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -1047,12 +1048,12 @@ public class GameStartImpl implements GameStartService {
 					} else if(uservo.get진행중플로어() / 10 == 3 || uservo.get진행중플로어() / 10 == 2 ||
 							uservo.get진행중플로어() / 10 == 1 ) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("시너", 80, 15, 100, 90);
+							EnemyVO enemyvo = new EnemyVO("시너", 80, 15, 100, 90,24);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 90, 16, 100, 90);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 90, 16, 100, 90,30);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 

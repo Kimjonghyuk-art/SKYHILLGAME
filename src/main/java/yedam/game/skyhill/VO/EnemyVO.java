@@ -11,4 +11,6 @@ public class EnemyVO {
 	private int 공격력;
 	private int 경험치;
 	private double 명중률;
+	private double 회피율;
+	
 }
