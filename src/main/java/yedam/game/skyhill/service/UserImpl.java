@@ -15,12 +15,13 @@ import yedam.game.skyhill.VO.WeaponVO;
 
 public class UserImpl implements User {
 	private DataSource dataSource = DataSource.getInstance();
-	private Connection con = dataSource.getConnection();
+	private Connection con;
 	private PreparedStatement psmt;
 	private ResultSet rs;
 	
 	@Override
 	public int Insertitems(int randomNum,String tablename) { //아이템 추가 메소드 
+		con = dataSource.getConnection();
 		int result = 0;
 		String sql = "INSERT INTO inventory (ccode,itemcode,name,effect,grade)"
 				+ " SELECT ccode,itemcode,name,effect,grade"
@@ -32,7 +33,11 @@ public class UserImpl implements User {
 			result = psmt.executeUpdate();
 		} catch(SQLException e) {
 			e.printStackTrace();
-		}
+		} finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		
 		return result;
 
@@ -49,6 +54,7 @@ public class UserImpl implements User {
 	//인벤토리 전체 조회 메소드 
 	@Override
 	public List<InventoryVO> selectInventory() {
+		con = dataSource.getConnection();
 		List<InventoryVO> inventorylist = new ArrayList<InventoryVO>();
 
 		String sql = "SELECT * FROM inventory";
@@ -73,12 +79,16 @@ public class UserImpl implements User {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		return inventorylist;
 	}
 	@Override
 	public int inventoryUpdateitems(int randonNum, int ccode) {
-		
+		con = dataSource.getConnection();
 		int result = -1;
 		String sql = "UPDATE inventory SET count = count+1 WHERE itemcode=? AND ccode = ?";
 		try {
@@ -88,13 +98,18 @@ public class UserImpl implements User {
 			result = psmt.executeUpdate();
 		} catch(SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		
 		return result;
 		
 	}
 	@Override
 	public int deleteitems(String name,int ccode) {
+		con = dataSource.getConnection();
 		int result = -1;
 		String sql = "DELETE FROM inventory WHERE name ='"+name+"'";
 		
@@ -104,7 +119,11 @@ public class UserImpl implements User {
 			result = psmt.executeUpdate();
 		} catch(SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		
 		return result;
 	}
@@ -113,6 +132,7 @@ public class UserImpl implements User {
 	//응급 도구 추가 메소드 
 	@Override
 	public int insertKitItems(int randomNum) {
+		con = dataSource.getConnection();
 		int result = 0;
 		System.out.println("응급 아이템 인덱스 >"+randomNum);
 		String sql = "INSERT INTO inventory (ccode,itemcode,name,effect,grade)"
@@ -125,7 +145,11 @@ public class UserImpl implements User {
 			result = psmt.executeUpdate();
 		} catch(SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		
 		return result;
 
@@ -133,6 +157,7 @@ public class UserImpl implements User {
 
 	@Override
 	public int minousCountitems(String name, int ccode) {
+		con = dataSource.getConnection();
 		int result = -1;
 		String sql = "UPDATE inventory SET count = count-1 WHERE name="+"'"+name+"'"+"AND ccode = ?";
 		
@@ -143,13 +168,18 @@ public class UserImpl implements User {
 			result = psmt.executeUpdate();
 		} catch(SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		
 		return result;
 	}
 
 
 	public int deleteAllInventory() {
+		con = dataSource.getConnection();
 		int result = 0;
 	
 		String sql = "DELETE FROM inventory";
@@ -158,11 +188,16 @@ public class UserImpl implements User {
 			result = psmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		return result;
 	}
 
 	public int AllWeaponsUpdate0() {
+		con = dataSource.getConnection();
 		int result = 0;
 		String sql = "UPDATE weapons SET usecheck = 0";
 		
@@ -171,14 +206,18 @@ public class UserImpl implements User {
 			result = psmt.executeUpdate();
 		} catch(SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		
 		return result;
 	}
 
 	@Override
 	public List<InventoryVO> inventoryWeaponSelect() {
-		
+		con = dataSource.getConnection();
 		List<InventoryVO> inventorylist = new ArrayList<InventoryVO>();
 		
 		String sql = "SELECT i.ccode,i.itemcode,i.grade,i.count,i.name,w.effect,w.dex,w.str,w.spd,w.usecheck "
@@ -207,7 +246,11 @@ public class UserImpl implements User {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		
 		
 		
@@ -218,6 +261,7 @@ public class UserImpl implements User {
 
 	@Override
 	public int useUpdateWeapon(String name,int usecheck) {
+		con = dataSource.getConnection();
 		int result = -1;
 		String sql = "UPDATE weapons SET usecheck = ? WHERE name = "+"'"+name+"'";
 		try {
@@ -227,7 +271,11 @@ public class UserImpl implements User {
 			
 		} catch(SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		return result;
 	}
 
@@ -235,7 +283,7 @@ public class UserImpl implements User {
 
 	@Override
 	public WeaponVO currentUsedWeapon() {
-
+		con = dataSource.getConnection();
 		String sql = "SELECT * FROM weapons WHERE usecheck = 1";
 		
 		WeaponVO weaponvo = new WeaponVO();
@@ -260,7 +308,11 @@ public class UserImpl implements User {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		return weaponvo;
 	}
 	

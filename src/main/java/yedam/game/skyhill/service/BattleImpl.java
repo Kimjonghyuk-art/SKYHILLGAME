@@ -13,7 +13,6 @@ public class BattleImpl implements Battle {
 		System.out.println("\t\t\t\t\t 적 : " + enemyvo.get이름());
 		System.out.printf("\t\t적 체력 : %.1f \t\t\t\t\t 내 체력 : %.1f ", enemyvo.get체력(), uservo.get체력());
 		System.out.println();
-
 	}
 
 	@Override
@@ -26,7 +25,7 @@ public class BattleImpl implements Battle {
 		double 최대명중률 = uservo.get기본명중률() * uservo.get보정명중률() + uservo.get기본명중률();
 		double 기본명중률 = uservo.get기본명중률();
 		double 최소명중률 = uservo.get기본명중률() - uservo.get보정명중률() * uservo.get기본명중률();
-		while (enemyvo.get체력() > 0) {
+		while (enemyvo.get체력() >= 0) {
 			battleInterface(enemyvo, uservo);
 			double 데미지보정률 = ((ran.nextDouble() + 0.7));
 			double 최소보정데미지 = (최소데미지 * 데미지보정률);
@@ -45,7 +44,7 @@ public class BattleImpl implements Battle {
 			} else if (select == 2) {
 				attack(기본보정데미지, 기본명중률-enemyvo.get회피율(), enemyvo, uservo, count, select);
 			} else if (select == 3) {
-				attack(최대보정데미지, 최대명중률-enemyvo.get회피율(), enemyvo, uservo, count, select);
+				attack(최대보정데미지, 최소명중률-enemyvo.get회피율(), enemyvo, uservo, count, select);
 			} else {
 				System.out.println("잘못된 값 입력했슈");
 			}
@@ -57,8 +56,9 @@ public class BattleImpl implements Battle {
 		// 획득 경험치 저장
 		uservo.set경험치(uservo.get경험치() + enemyvo.get경험치());
 		if (uservo.get경험치() > uservo.get레벨업필요경험치()) {
-			System.out.println("\t\t\t\tLEVEL UP!!");
+			System.out.println("\t\t\t\t★☆★☆★☆LEVEL UP!!★☆★☆★☆");
 			System.out.println("\t\t\t\t어빌리티포인트 +4 획득!");
+			System.out.println("\t\t\t\t <tip> 스탯은 100층에서 사용가능합니다.");
 			uservo.set경험치(uservo.get경험치() - uservo.get레벨업필요경험치()); // 경험치 초기화
 			uservo.set레벨업필요경험치(uservo.get레벨업필요경험치() * 1.5);// 필요경험치 1.5배
 			uservo.set어빌리티포인트((uservo.get어빌리티포인트() + 4)); // 어빌리티 저장
@@ -87,7 +87,7 @@ public class BattleImpl implements Battle {
 
 		if (ran.nextInt(100) < 명중률) { // 명중률 확률
 			if (ran.nextInt(100) < uservo.get치명타확률()) { // 치명타 확률 안에 들어오면 크리티컬
-				System.out.println("\t\t\t\t\t크리티컬 히트!!");
+				System.out.println("\t\t\t\t★☆★☆★☆크리티컬 히트!!★☆★☆★☆");
 				System.out.printf("\t\t\t\t" + enemyvo.get이름() + "에게 %.1f 의 피해를 입혔습니다!\n", 데미지 * 1.4);
 				enemyvo.set체력(enemyvo.get체력() - 데미지 * 1.4);
 
@@ -99,7 +99,7 @@ public class BattleImpl implements Battle {
 			}
 
 			if (ran.nextInt(100) < (uservo.get속도() * 2) && count == 0) { // 추가공격 확률
-				System.out.println("\t\t\t\t\t추가공격!!");
+				System.out.println("\t\t\t\t\t!!추가공격!!");
 				System.out.println();
 				count += 1;
 				if (select == 1) {
@@ -107,7 +107,7 @@ public class BattleImpl implements Battle {
 				} else if (select == 2) {
 					attack(기본보정데미지, 기본명중률, enemyvo, uservo, count, select);
 				} else if (select == 3) {
-					attack(최대보정데미지, 최대명중률, enemyvo, uservo, count, select);
+					attack(최대보정데미지, 최소명중률, enemyvo, uservo, count, select);
 				}
 			} else { // 추가공격 안터지면 적공격
 				enemyAttack(enemyvo, uservo);

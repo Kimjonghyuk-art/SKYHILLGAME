@@ -80,11 +80,15 @@ public class GameStartImpl implements GameStartService {
 		System.out.println("\t\t\t\t\t ─────────────");
 		System.out.println("\t\t\t\t\t  현재 층 : " + uservo.get진행중플로어());
 		System.out.println("\t\t\t\t\t ─────────────");
-		System.out.printf("\t\t\t\t\t\t\t\t 체력 : %.1f\n " , uservo.get체력());
+		System.out.printf("\t\t\t\t\t\t\t\t 체력 : %.1f\n ", uservo.get체력());
 		System.out.println("\t\t\t\t\t\t\t\t 스태미너 : " + uservo.get스태미너());
 		System.out.println();
 		System.out.println();
 		System.out.println();
+		if (uservo.get진행중플로어() == 1) {
+			System.out.println("\t\t\t★☆★☆★☆★☆★☆★☆★☆게임 클리어!!!!!★☆★☆★☆★☆★☆★☆");
+			System.exit(0);
+		}
 	}
 
 	// 100층 플로어 메뉴
@@ -95,43 +99,102 @@ public class GameStartImpl implements GameStartService {
 		System.out.println("\t\t\t\t\t ─────────────");
 		System.out.println("\t\t\t\t\t  현재 층 : " + uservo.get시작플로어());
 		System.out.println("\t\t\t\t\t ─────────────");
-		System.out.println("\t\t\t\t\t\t\t\t 체력 : " + uservo.get체력());
+		System.out.printf("\t\t\t\t\t\t\t\t 체력 : %.1f \n", uservo.get체력());
 		System.out.println("\t\t\t\t\t\t\t\t 스태미너 : " + uservo.get스태미너());
 		System.out.println();
 		System.out.println();
 		System.out.println();
-		System.out.println("1.내려가기 2.수면 3.현재 스테이터스 확인 4.현재 진행상황 보기");
+		System.out.println("1.내려가기 2.수면 3.현재 스테이터스 확인 4.현재 진행상황 보기 5.맵 보기");
 		System.out.print("선택 >>");
 		try {
 			int selectFloorMenu = sc.nextInt();
-
 			while (true) {
 				if (selectFloorMenu == 1) { // 내려가기
 					staminaLogic(); // 스태미너 감소
 					uservo.set진행중플로어(uservo.get시작플로어() - 1);
 					floorlist = fd.FloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
-
-					// 아이템 메소드 작성
-
-					// 자판기or 엘리베이터 작성
-
 					progressMenu(); // 진행 실행
+
 				} else if (selectFloorMenu == 2) { // 수면
 					goSleep(uservo);
 				} else if (selectFloorMenu == 3) { // 스테이터스
 					getUserStatus(uservo);
 				} else if (selectFloorMenu == 4) { // 진행상황 보기
+					getCurrentPlay(uservo);
 
+				} else if (selectFloorMenu == 5) { // 맵 보기
+					floorlist = fd.getAllFloorinfo();
+					leftfloorlist = fd.getAllLeftfloorinfo();
+					rightfloorlist = fd.getAllRightfloorinfo();
+					getMap(floorlist, leftfloorlist, rightfloorlist, uservo.get진행중플로어());
+
+				} else {
+					selectFloorMenu();
 				}
 			}
 
 		} catch (InputMismatchException e) {
 			System.out.println("잘못입력");
 
-		} finally {
+		} /*
+			 * finally { selectFloorMenu(); }
+			 */
+
+	}
+
+	private void getMap(List<FloorInfoVO> floorlist, List<leftfloorinfoVO> leftfloorlist,
+			List<rightfloorinfoVO> rightfloorlist, int 진행중플로어) {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("10층 단위로 조회할 수 있습니다.");
+		System.out.println("조회할 층 입력 >  ");
+		int selectNum = sc.nextInt();
+		showMap(selectNum, floorlist, leftfloorlist, rightfloorlist, 진행중플로어);
+	}
+
+	private void showMap(int selectNum, List<FloorInfoVO> floorlist, List<leftfloorinfoVO> leftfloorlist,
+			List<rightfloorinfoVO> rightfloorlist, int 진행중플로어) {
+		String black = " ■■■■■■■■ ";
+		String white = "【   O   】";
+		int selectfloorNum = (selectNum / 10);
+		System.out.println("\t\t\t  ┌────────────────────────────────────┐");
+		for (int i = 0; i < floorlist.size(); i++) {
+			if ((floorlist.get(i).getFloorNum() / 10) == selectfloorNum) {
+				if (leftfloorlist.get(i).getCheckfloor().equals("0")
+						&& rightfloorlist.get(i).getCheckfloor().equals("0")) {
+					System.out.printf("\t\t\t\t%s %d 층 %s\t\t\t\t\t \n", black, floorlist.get(i).getFloorNum(), black);
+
+				} else if (leftfloorlist.get(i).getCheckfloor().equals("0")
+						&& rightfloorlist.get(i).getCheckfloor().equals("1")) {
+					
+					System.out.printf("\t\t\t\t%s %d 층 %s\t\t\t\t\t \n", black, floorlist.get(i).getFloorNum(), white);
+				} else if (leftfloorlist.get(i).getCheckfloor().equals("1")
+						&& rightfloorlist.get(i).getCheckfloor().equals("0")) {
+					
+					System.out.printf("\t\t\t\t%s %d 층 %s\t\t\t\t\t \n", white, floorlist.get(i).getFloorNum(), black);
+				} else if (leftfloorlist.get(i).getCheckfloor().equals("1")
+						&& rightfloorlist.get(i).getCheckfloor().equals("1")) {
+					
+					System.out.printf("\t\t\t\t%s %d 층 %s\t\t\t\t\t \n", white, floorlist.get(i).getFloorNum(), white);
+				}
+			}
+		}
+		System.out.println("\t\t\t  └────────────────────────────────────┘");
+		if (진행중플로어 == 100) {
 			selectFloorMenu();
+
+		} else {
+			progressMenu();
 		}
 
+	}
+
+	private void getCurrentPlay(UserVO uservo2) {
+		System.out.println("┌──────────────────────────────┐");
+		System.out.printf("  현재까지 진행한 층 > %s \n", uservo.get마지막플로어());
+		// System.out.printf(" 앞으로 남은 층 > > %s \n
+		// ",uservo.get마지막플로어()-uservo.get시작플로어());
+		System.out.println("└──────────────────────────────┘");
+		selectFloorMenu();
 	}
 
 	private void goSleep(UserVO uservo) {
@@ -140,33 +203,32 @@ public class GameStartImpl implements GameStartService {
 		System.out.println("────────수면 시간 선택──────  ");
 		System.out.println("1. 1시간 2. 2시간 0.뒤로가기");
 		int selectSleep = sc.nextInt();
-		
-		if(selectSleep == 1) {
-			if(uservo.get스태미너() >= 15) {
+
+		if (selectSleep == 1) {
+			if (uservo.get스태미너() >= 15) {
 				System.out.println("회복량 > 스태미너-15 체력+ 20");
-				uservo.set체력(uservo.get체력()+20);
-				uservo.set스태미너(uservo.get스태미너()-15);
-				selectFloorMenu();	
+				uservo.set체력(uservo.get체력() + 20);
+				uservo.set스태미너(uservo.get스태미너() - 15);
+				selectFloorMenu();
 			} else {
 				System.out.println("현재 스태미너가 부족합니다.");
-				selectFloorMenu();	
+				selectFloorMenu();
 			}
 		} else if (selectSleep == 2) {
-			if(uservo.get스태미너() >= 30) {
+			if (uservo.get스태미너() >= 30) {
 				System.out.println("회복량 > 스태미너-30 체력+ 40");
-				uservo.set체력(uservo.get체력()+40);
-				uservo.set스태미너(uservo.get스태미너()-30);
+				uservo.set체력(uservo.get체력() + 40);
+				uservo.set스태미너(uservo.get스태미너() - 30);
 				selectFloorMenu();
-				
+
 			} else {
 				System.out.println("현재 스태미너가 부족합니다.");
-				selectFloorMenu();	
+				selectFloorMenu();
 			}
-		}  else if (selectSleep == 0) {
+		} else if (selectSleep == 0) {
 			selectFloorMenu();
 		}
-		
-		
+
 	}
 
 	private void getUserStatus(UserVO uservo) {
@@ -191,7 +253,7 @@ public class GameStartImpl implements GameStartService {
 			System.out.printf("  착용중 장비 : 없음                       ");
 		}
 		System.out.println();
-		System.out.printf("  현재 공격력 > %s                          ", uservo.get공격력());
+		System.out.printf("  현재 공격력 > %.1f                          ", uservo.get공격력());
 		System.out.println();
 		System.out.printf("  Str > %s                           ", uservo.get강도());
 		System.out.println();
@@ -233,9 +295,11 @@ public class GameStartImpl implements GameStartService {
 						uservo.set어빌리티포인트(uservo.get어빌리티포인트() - 1);
 					} else if (setStatus == 3) {
 						uservo.set민첩(uservo.get민첩() + 1);
+						uservo.set회피율(uservo.get회피율()+2);
 						uservo.set어빌리티포인트(uservo.get어빌리티포인트() - 1);
 					} else if (setStatus == 4) {
 						uservo.set명중(uservo.get명중() + 1);
+						uservo.set기본명중률(uservo.get기본명중률()+2);
 						uservo.set어빌리티포인트(uservo.get어빌리티포인트() - 1);
 					}
 
@@ -259,14 +323,29 @@ public class GameStartImpl implements GameStartService {
 	public void progressMenu() {
 		Scanner sc = new Scanner(System.in);
 		getStatus();
-		System.out.println("1.내려가기  2.왼쪽방 들어가기 3.오른쪽방 들어가기 4.올라가기 5.엘리베이터 6.내 인벤토리 확인");
+		System.out.println("1.내려가기  2.왼쪽방 들어가기 3.오른쪽방 들어가기 4.올라가기 5.엘리베이터 6.내 인벤토리 확인 7.맵 보기");
 		System.out.print("선택>>");
 		try {
 			int selectMenu = sc.nextInt();
 
 			while (true) {
 				if (selectMenu == 1) { // 내려가기
+					if (fd.checkFloor(floorlist.get(0).getFloorNum()) == 0) {
+						fd.checkFloor(floorlist.get(0).getFloorNum());// 방문 체크
+					}
 					staminaLogic(); // 스태미너 감소
+					floorlist = fd.selectElevator(); // 엘리베이터 담은 리스트
+					boolean checkelevator = false;
+					for (FloorInfoVO vo : floorlist) {
+						if (vo.getFloorNum() == uservo.get진행중플로어()) {
+							checkelevator = true;
+							break;
+						}
+					}
+					if (checkelevator) {
+						System.out.println("\t\t\t\t  엘리베이터 이용 가능한 플로어입니다.");
+					}
+
 					uservo.set진행중플로어(uservo.get진행중플로어() - 1);
 					if (uservo.get진행중플로어() < uservo.get마지막플로어()) {
 						uservo.set마지막플로어(uservo.get진행중플로어()); // 마지막 플로어 저장
@@ -277,14 +356,9 @@ public class GameStartImpl implements GameStartService {
 						CreateEnemy(floorlist);
 					}
 
-					if (fd.checkFloor(floorlist.get(0).getFloorNum()) == 0) {
-						fd.checkFloor(floorlist.get(0).getFloorNum());// 방문 체크
-					}
-
 					progressMenu();
 				} else if (selectMenu == 2) { // 왼쪽방 들어가기
 
-					
 					leftfloorlist = fd.leftFloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
 
 					if (leftfloorlist.get(0).getCheckfloor().equals("0")) { // 플로어체크가 0이면
@@ -296,19 +370,31 @@ public class GameStartImpl implements GameStartService {
 
 					progressMenu();
 				} else if (selectMenu == 3) { // 오른쪽 방 들어가기
-					
+
 					rightfloorlist = fd.rightFloorInfo(uservo.get진행중플로어()); // 층별셀렉트값 넘겨줌
-					
-					if(rightfloorlist.get(0).getCheckfloor().equals("0")) {
+
+					if (rightfloorlist.get(0).getCheckfloor().equals("0")) {
 						staminaLogic();
 						rightfloormenu(rightfloorlist);
-					}else if (rightfloorlist.get(0).getCheckfloor().equals("1")) {
+					} else if (rightfloorlist.get(0).getCheckfloor().equals("1")) {
 						System.out.println("이미 입장한 방입니다.");
 					}
 					progressMenu();
 				} else if (selectMenu == 4) { // 올라가기
 					uservo.set진행중플로어(uservo.get진행중플로어() + 1);
 					staminaLogic();
+					floorlist = fd.selectElevator(); // 엘리베이터 담은 리스트
+					boolean checkelevator = false;
+					for (FloorInfoVO vo : floorlist) {
+						if (vo.getFloorNum() == uservo.get진행중플로어()) {
+							checkelevator = true;
+							break;
+						}
+					}
+
+					if (checkelevator) {
+						System.out.println("\t\t\t\t  엘리베이터 이용 가능한 플로어입니다.");
+					}
 
 					if (uservo.get진행중플로어() == 100) {
 						selectFloorMenu();
@@ -342,7 +428,7 @@ public class GameStartImpl implements GameStartService {
 						System.out.println("엘리베이터 이용 가능한 플로어입니다.");
 						System.out.print("이동할 층 선택 >");
 						int select = sc.nextInt();
-						if (select < uservo.get마지막플로어()) {
+						if (select < uservo.get마지막플로어() || select == uservo.get시작플로어()) {
 							System.out.println("이동 불가능한 층");
 						} else {
 							uservo.set진행중플로어(select);
@@ -359,8 +445,13 @@ public class GameStartImpl implements GameStartService {
 					inventorymenu();
 
 					progressMenu();
-				} else if (selectMenu == 7) {
-
+				} else if (selectMenu == 7) { // 맵 보기
+					floorlist = fd.getAllFloorinfo();
+					leftfloorlist = fd.getAllLeftfloorinfo();
+					rightfloorlist = fd.getAllRightfloorinfo();
+					getMap(floorlist, leftfloorlist, rightfloorlist, uservo.get진행중플로어());
+				} else {
+					progressMenu();
 				}
 			}
 
@@ -372,8 +463,6 @@ public class GameStartImpl implements GameStartService {
 		}
 
 	}
-
-	
 
 	private void inventorymenu() {
 		Scanner sc = new Scanner(System.in);
@@ -422,9 +511,10 @@ public class GameStartImpl implements GameStartService {
 		}
 
 		System.out.println("└────────────────────────────────────────────────────────────┘");
-		System.out.println("1.뒤로가기 2.아이템사용 3.장비착용");
+		System.out.println("1.뒤로가기 2.아이템사용 3.장비착용 4.장비 버리기");
 		System.out.print("선택 >");
 		int inventoryMenu = sc.nextInt();
+		sc.nextLine();
 
 		while (true) {
 			if (inventoryMenu == 1) { // 뒤로가기1
@@ -450,7 +540,7 @@ public class GameStartImpl implements GameStartService {
 
 					System.out.println("현재 착용중인 장비 > " + inventorylist.get(usingCheckIndex).getName());
 					System.out.print("착용할 장비 선택 >");
-					String selectEquipment = sc.next();
+					String selectEquipment = sc.nextLine();
 
 					for (int i = 0; i < inventorylist.size(); i++) {
 
@@ -462,7 +552,7 @@ public class GameStartImpl implements GameStartService {
 							userimpl.useUpdateWeapon(inventorylist.get(usingCheckIndex).getName(), 0);// 착용해제
 							userimpl.useUpdateWeapon(inventorylist.get(i).getName(), 1);// 사용체크
 							break;
-						} else if (i == inventorylist.size()-1) {
+						} else if (i == inventorylist.size() - 1) {
 							System.out.println(selectEquipment + "(이)가 없습니다.");
 						}
 
@@ -471,7 +561,7 @@ public class GameStartImpl implements GameStartService {
 				} else if (!usingCheck) { // 사용중인 장비가 없다면
 
 					System.out.print("착용할 장비 선택 >");
-					String selectEquipment = sc.next();
+					String selectEquipment = sc.nextLine();
 
 					for (int i = 0; i < inventorylist.size(); i++) {
 
@@ -481,7 +571,7 @@ public class GameStartImpl implements GameStartService {
 							System.out.println("착용 후 공격력 " + uservo.get공격력());
 							userimpl.useUpdateWeapon(inventorylist.get(i).getName(), 1);// 사용체크
 							break;
-						} else if (i == inventorylist.size()-1) {
+						} else if (i == inventorylist.size() - 1) {
 							System.out.println(selectEquipment + "(이)가 없습니다.");
 						}
 
@@ -490,8 +580,46 @@ public class GameStartImpl implements GameStartService {
 
 				// weaponvo = userimpl.currentUsedWeapon(); //현재 착용중인 장비 가지고오기
 
-				inventorymenu();
+			} else if (inventoryMenu == 4) {
+				inventorylist = userimpl.inventoryWeaponSelect(); // 조인한 결과 값담은 리스트
+				int usingCheckIndex = -1;
+				boolean usingCheck = false;
+				// 착용중인 장비가 있다면 착용중인 장비 인덱스값 저장
+				for (int i = 0; i < inventorylist.size(); i++) {
+					if (inventorylist.get(i).getWeaponvo().getUsecheck().equals("1")) {
+						usingCheckIndex = i;
+						usingCheck = true;
+					}
+				}
+
+				System.out.println("장비를 하나 버리고 확률적으로 랜덤한 아이템을 획득합니다.");
+				System.out.print("버릴 아이템 선택 >>");
+				String selectEquipment = sc.nextLine();
+
+				for (int i = 0; i < inventorylist.size(); i++) {
+					if (inventorylist.get(i).getName().equals(selectEquipment) && // 이름이 같고
+							inventorylist.get(i).getWeaponvo().getUsecheck().equals("1")) { // 사용중이라면
+						System.out.println("사용중인 장비는 버릴 수 없습니다.");
+						break;
+					} else if (inventorylist.get(i).getName().equals(selectEquipment) && // 이름이 같고
+							inventorylist.get(i).getCount() > 1) { // 카운트가 1 초과면
+						System.out.println(inventorylist.get(i).getName() + "를 1개 버립니다.");
+						userimpl.minousCountitems(selectEquipment, inventorylist.get(i).getCcode());
+						dropitems();
+						break;
+					} else if (inventorylist.get(i).getName().equals(selectEquipment) && // 이름이 같고
+							inventorylist.get(i).getCount() == 1) { // 소지수가 1개라면
+						userimpl.deleteitems(selectEquipment, inventorylist.get(i).getCcode());
+						System.out.println(inventorylist.get(i).getName()+" 1개 삭제 !");
+						dropitems();
+						break;
+					} else if (i == inventorylist.size() - 1) {
+						System.out.println(selectEquipment + "(이)가 없습니다.");
+					}
+
+				}
 			}
+			inventorymenu();
 		} // 반복문 종료
 
 	}
@@ -500,7 +628,7 @@ public class GameStartImpl implements GameStartService {
 	private void selectinventoryitem(List<InventoryVO> inventorylist) {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("사용 할 아이템 선택 > ");
-		String selectitem = sc.next();
+		String selectitem = sc.nextLine();
 
 		for (int i = 0; i < inventorylist.size(); i++) {
 			if (inventorylist.get(i).getName().equals(selectitem) && // 이름이같고
@@ -547,9 +675,9 @@ public class GameStartImpl implements GameStartService {
 		if (leftfloorlist.get(0).getCheckfloor().equals("0")) {
 			// 적 생성 메소드 실행
 			CreateEnemyleft(leftfloorlist);
-			for(int i = 0; i < itemcount; i++) {
+			for (int i = 0; i < itemcount; i++) {
 				dropitems();
-				
+
 			}
 
 		}
@@ -565,16 +693,18 @@ public class GameStartImpl implements GameStartService {
 				fd.leftCheckFloor(leftfloorlist.get(0).getFloorNum());
 			}
 			progressMenu();
-		} else {
+		} else if (selectNum != 1) {
 			System.out.println("잘못 입력");
+
 			if (leftfloorlist.get(0).getCheckfloor().equals("0")) {
 				fd.leftCheckFloor(leftfloorlist.get(0).getFloorNum());
+
 			}
 			progressMenu();
 		}
 	}
-	
-	//오른쪽방 메뉴 
+
+	// 오른쪽방 메뉴
 	private void rightfloormenu(List<rightfloorinfoVO> rightfloorlist) {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("\t\t\t\t\t\t\t\t┌──────────────────────────────┐");
@@ -613,10 +743,7 @@ public class GameStartImpl implements GameStartService {
 			progressMenu();
 		}
 
-		
 	}
-
-	
 
 	private void dropitems() {
 		Random ran = new Random();
@@ -636,7 +763,7 @@ public class GameStartImpl implements GameStartService {
 		int itemcode = Arandom;
 		if (foodlist.get(itemcode).getGrade().equals("C")) {
 			// System.out.println("1."+itemcode);
-			if (ran.nextInt(100) < 20) {// 30%확률
+			if (ran.nextInt(100) < 30) {// 30%확률
 				if (check(itemcode, foodlist.get(itemcode).getCcode(), inventorylist)) { // 기존에 있따면
 					int update = userimpl.inventoryUpdateitems(itemcode, foodlist.get(itemcode).getCcode());
 
@@ -662,7 +789,7 @@ public class GameStartImpl implements GameStartService {
 				}
 			}
 		} else if (foodlist.get(itemcode).getGrade().equals("B")) {
-			if (ran.nextInt(100) < 10) {// 20%확률
+			if (ran.nextInt(100) < 20) {// 20%확률
 				if (check(itemcode, foodlist.get(itemcode).getCcode(), inventorylist)) { // 기존인벤토리에 있따면
 					int update = userimpl.inventoryUpdateitems(itemcode, foodlist.get(itemcode).getCcode());
 
@@ -688,7 +815,7 @@ public class GameStartImpl implements GameStartService {
 				}
 			}
 		} else if (foodlist.get(itemcode).getGrade().equals("A")) {
-			if (ran.nextInt(100) < 5) {// 10%확률
+			if (ran.nextInt(100) < 8) {// 10%확률
 				if (check(itemcode, foodlist.get(itemcode).getCcode(), inventorylist)) {
 					int update = userimpl.inventoryUpdateitems(itemcode, foodlist.get(itemcode).getCcode());
 
@@ -726,7 +853,7 @@ public class GameStartImpl implements GameStartService {
 
 		if (kititemslist.get(itemcode).getGrade().equals("C")) {
 			// System.out.println("1."+itemcode);
-			if (ran.nextInt(100) < 20) {// 30%확률
+			if (ran.nextInt(100) < 20) {// 20%확률
 				if (check(itemcode, kititemslist.get(itemcode).getCcode(), inventorylist)) {
 					int update = userimpl.inventoryUpdateitems(itemcode, kititemslist.get(itemcode).getCcode());
 
@@ -778,7 +905,7 @@ public class GameStartImpl implements GameStartService {
 				}
 			}
 		} else if (kititemslist.get(itemcode).getGrade().equals("A")) {
-			if (ran.nextInt(100) < 5) {// 30%확률
+			if (ran.nextInt(100) < 3) {// 30%확률
 				if (check(itemcode, kititemslist.get(itemcode).getCcode(), inventorylist)) {
 					int update = userimpl.inventoryUpdateitems(itemcode, kititemslist.get(itemcode).getCcode());
 
@@ -813,7 +940,7 @@ public class GameStartImpl implements GameStartService {
 		itemcode = Arandom;
 		if (weaponlist.get(itemcode).getGrade().equals("C")) {
 			// System.out.println("1."+itemcode);
-			if (ran.nextInt(100) < 20) {// 30%확률
+			if (ran.nextInt(100) < 10) {// 10%확률
 				if (check(itemcode, weaponlist.get(itemcode).getCcode(), inventorylist)) {
 					int update = userimpl.inventoryUpdateitems(itemcode, weaponlist.get(itemcode).getCcode());
 
@@ -837,8 +964,8 @@ public class GameStartImpl implements GameStartService {
 					}
 				}
 			}
-		}else if (weaponlist.get(itemcode).getGrade().equals("B")) {
-			if (ran.nextInt(100) < 10) {// 30%확률
+		} else if (weaponlist.get(itemcode).getGrade().equals("B")) {
+			if (ran.nextInt(100) < 5) {// 5%확률
 				if (check(itemcode, weaponlist.get(itemcode).getCcode(), inventorylist)) {
 					int update = userimpl.inventoryUpdateitems(itemcode, weaponlist.get(itemcode).getCcode());
 
@@ -855,7 +982,34 @@ public class GameStartImpl implements GameStartService {
 						System.out.println("업데이트를 실패하셨습니다.");
 					}
 				} else if (!check(itemcode, weaponlist.get(itemcode).getCcode(), inventorylist)) {
-					userimpl.Insertitems(itemcode, kititems);
+					userimpl.Insertitems(itemcode, weapons);
+					for (int i = 0; i < weaponlist.size(); i++) {
+						if (weaponlist.get(i).getItemcode() == Arandom) {
+							System.out.println(">" + weaponlist.get(i).getName() + "+1 획득");
+							// System.out.println("들어온 랜덤 아이템 코드 >" + foodlist.get(i).getItemcode());
+						}
+					}
+				}
+			}
+		} else if (weaponlist.get(itemcode).getGrade().equals("A")) {
+			if (ran.nextInt(100) < 1) {// 1%확률
+				if (check(itemcode, weaponlist.get(itemcode).getCcode(), inventorylist)) {
+					int update = userimpl.inventoryUpdateitems(itemcode, weaponlist.get(itemcode).getCcode());
+
+					if (update != 0) {
+						for (int i = 0; i < weaponlist.size(); i++) {
+							if (weaponlist.get(i).getItemcode() == Arandom) {
+								System.out.println(" >" + weaponlist.get(i).getName() + "+1 추가");
+								// System.out.println("들어온 랜덤 아이템 코드 >" + foodlist.get(i).getItemcode());
+							}
+						}
+					} else if (update == 0) {
+						System.out.println("5.");
+						System.out.println("아이템이름 > " + weaponlist.get(itemcode).getName());
+						System.out.println("업데이트를 실패하셨습니다.");
+					}
+				} else if (!check(itemcode, weaponlist.get(itemcode).getCcode(), inventorylist)) {
+					userimpl.Insertitems(itemcode, weapons);
 					for (int i = 0; i < weaponlist.size(); i++) {
 						if (weaponlist.get(i).getItemcode() == Arandom) {
 							System.out.println(">" + weaponlist.get(i).getName() + "+1 획득");
@@ -884,49 +1038,49 @@ public class GameStartImpl implements GameStartService {
 		int enemyInCount = (int) (Math.random() * 2) + 1;
 		for (int i = 0; i < leftfloorlist.size(); i++) {
 			// 적 출현 메소드 작성 업데이트 쿼리
-			if (leftfloorlist.get(i).getCheckfloor().equals("0")) { // 방문없으면 
+			if (leftfloorlist.get(i).getCheckfloor().equals("0")) { // 방문없으면
 				// int ran = (int)(Math.random()*30)+1;
 				Random ran = new Random();
-				if (ran.nextInt(100) < 20) {// 20%확률 //에너미 인카운트 변경
+				if (ran.nextInt(100) < 8) {// 10%확률 //에너미 인카운트 변경
 					enemy.enemyInCount(leftfloorlist.get(i).getFloorNum());
 					System.out.println("적 출현");
 
 					if (uservo.get진행중플로어() / 10 == 9 || // 90층대 80층대 70층대
 							uservo.get진행중플로어() / 10 == 8 || uservo.get진행중플로어() / 10 == 7) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 20, 6, 20, 60,10);
+							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 30, 6, 40, 60, 10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("졸병", 25, 7, 25, 65,10);
+							EnemyVO enemyvo = new EnemyVO("졸병", 30, 7, 45, 65, 10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						}
 
-					} else if(uservo.get진행중플로어() / 10 == 6 || uservo.get진행중플로어() / 10 == 5 ||
-							uservo.get진행중플로어() / 10 == 4) {
+					} else if (uservo.get진행중플로어() / 10 == 6 || uservo.get진행중플로어() / 10 == 5
+							|| uservo.get진행중플로어() / 10 == 4) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("포효자", 40, 10, 45, 70,15);
+							EnemyVO enemyvo = new EnemyVO("포효자", 40, 8, 80, 70, 15);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 50, 80,19);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 9, 90, 80, 19);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						}
-					} else if(uservo.get진행중플로어() / 10 == 3 || uservo.get진행중플로어() / 10 == 2 ||
-							uservo.get진행중플로어() / 10 == 1 ) {
+					} else if (uservo.get진행중플로어() / 10 == 3 || uservo.get진행중플로어() / 10 == 2
+							|| uservo.get진행중플로어() / 10 == 1 || uservo.get진행중플로어() / 10 == 0) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("시너", 80, 15, 100, 90,24);
+							EnemyVO enemyvo = new EnemyVO("시너", 80, 9, 170, 90, 25);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 90, 16, 100, 90,30);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 100, 8, 200, 90, 25);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -935,18 +1089,19 @@ public class GameStartImpl implements GameStartService {
 				}
 			}
 
-		}	}
+		}
+	}
 
-	//오른쪽 방 적 생성 메소드
+	// 오른쪽 방 적 생성 메소드
 	private void CreateEnemyRight(List<rightfloorinfoVO> rightfloorlist) {
 		BattleImpl battle = new BattleImpl();
 		int enemyInCount = (int) (Math.random() * 2) + 1;
 		for (int i = 0; i < rightfloorlist.size(); i++) {
 			// 적 출현 메소드 작성 업데이트 쿼리
-			if (rightfloorlist.get(i).getCheckfloor().equals("0")) { // 방문한 적 없다면 
+			if (rightfloorlist.get(i).getCheckfloor().equals("0")) { // 방문한 적 없다면
 				// int ran = (int)(Math.random()*30)+1;
 				Random ran = new Random();
-				if (ran.nextInt(100) < 20) {// 20%확률 //에너미 인카운트 변경
+				if (ran.nextInt(100) < 8) {// 8%확률 //에너미 인카운트 변경
 					enemy.enemyInCount(rightfloorlist.get(i).getFloorNum());
 					System.out.println("\t\t\t\t┌────────────────────────┐");
 					System.out.println("\t\t\t\t\t 적 출현");
@@ -955,39 +1110,39 @@ public class GameStartImpl implements GameStartService {
 					if (uservo.get진행중플로어() / 10 == 9 || // 90층대 80층대 70층대
 							uservo.get진행중플로어() / 10 == 8 || uservo.get진행중플로어() / 10 == 7) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 20, 6, 20, 60,10);
+							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 30, 5, 40, 60, 10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("졸병", 25, 7, 25, 65,10);
+							EnemyVO enemyvo = new EnemyVO("졸병", 35, 6, 45, 65, 10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						}
 
-					} else if(uservo.get진행중플로어() / 10 == 6 || uservo.get진행중플로어() / 10 == 5 ||
-							uservo.get진행중플로어() / 10 == 4) {
+					} else if (uservo.get진행중플로어() / 10 == 6 || uservo.get진행중플로어() / 10 == 5
+							|| uservo.get진행중플로어() / 10 == 4) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("포효자", 40, 10, 45, 70,15);
+							EnemyVO enemyvo = new EnemyVO("포효자", 45, 8, 70, 70, 15);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 50, 80,19);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 7, 80, 80, 19);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						}
-					} else if(uservo.get진행중플로어() / 10 == 3 || uservo.get진행중플로어() / 10 == 2 ||
-							uservo.get진행중플로어() / 10 == 1 ) {
+					} else if (uservo.get진행중플로어() / 10 == 3 || uservo.get진행중플로어() / 10 == 2
+							|| uservo.get진행중플로어() / 10 == 1 || uservo.get진행중플로어() / 10 == 0) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("시너", 80, 15, 100, 90,24);
+							EnemyVO enemyvo = new EnemyVO("시너", 80, 8, 100, 180, 20);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 90, 16, 100, 90,30);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 100, 7, 200, 90, 20);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
@@ -998,10 +1153,8 @@ public class GameStartImpl implements GameStartService {
 
 		}
 
-		
 	}
-	
-	
+
 	// 적 생성 메소드
 	private void CreateEnemy(List<FloorInfoVO> floorlist) {
 		BattleImpl battle = new BattleImpl();
@@ -1012,7 +1165,7 @@ public class GameStartImpl implements GameStartService {
 					&& floorlist.get(i).getEnemyInCount().equals("0")) { // 에너미카운터 0
 				// int ran = (int)(Math.random()*30)+1;
 				Random ran = new Random();
-				if (ran.nextInt(100) < 20) {// 20%확률 //에너미 인카운트 변경
+				if (ran.nextInt(100) < 8) {// 8%확률 //에너미 인카운트 변경
 					enemy.enemyInCount(floorlist.get(i).getFloorNum());
 					System.out.println("\t\t\t\t┌────────────────────────┐");
 					System.out.println("\t\t\t\t\t 적 출현");
@@ -1021,39 +1174,39 @@ public class GameStartImpl implements GameStartService {
 					if (uservo.get진행중플로어() / 10 == 9 || // 90층대 80층대 70층대
 							uservo.get진행중플로어() / 10 == 8 || uservo.get진행중플로어() / 10 == 7) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 20, 6, 20, 60,10);
+							EnemyVO enemyvo = new EnemyVO("이웃집괴물", 30, 6, 30, 60, 10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("졸병", 25, 7, 25, 65,10);
+							EnemyVO enemyvo = new EnemyVO("졸병", 35, 7, 35, 65, 10);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						}
 
-					} else if(uservo.get진행중플로어() / 10 == 6 || uservo.get진행중플로어() / 10 == 5 ||
-							uservo.get진행중플로어() / 10 == 4) {
+					} else if (uservo.get진행중플로어() / 10 == 6 || uservo.get진행중플로어() / 10 == 5
+							|| uservo.get진행중플로어() / 10 == 4) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("포효자", 40, 10, 45, 70,15);
+							EnemyVO enemyvo = new EnemyVO("포효자", 45, 9, 80, 60, 15);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 50, 80,19);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 50, 10, 75, 70, 14);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						}
-					} else if(uservo.get진행중플로어() / 10 == 3 || uservo.get진행중플로어() / 10 == 2 ||
-							uservo.get진행중플로어() / 10 == 1 ) {
+					} else if (uservo.get진행중플로어() / 10 == 3 || uservo.get진행중플로어() / 10 == 2
+							|| uservo.get진행중플로어() / 10 == 1 || uservo.get진행중플로어() / 10 == 0) {
 						if (enemyInCount == 1) {
-							EnemyVO enemyvo = new EnemyVO("시너", 80, 15, 100, 90,24);
+							EnemyVO enemyvo = new EnemyVO("시너", 60, 10, 180, 75, 20);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 
 						} else if (enemyInCount == 2) {
-							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 90, 16, 100, 90,30);
+							EnemyVO enemyvo = new EnemyVO("균형이 무너진 자", 70, 10, 200, 75, 20);
 
 							battle.battleStart(enemyvo, uservo); // 배틀 메소드 넘겨줌
 

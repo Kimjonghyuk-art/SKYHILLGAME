@@ -16,7 +16,7 @@ import yedam.game.skyhill.VO.WeaponVO;
 public class ItemsImpl implements Items {
 
 	private DataSource dataSource = DataSource.getInstance();
-	private Connection con = dataSource.getConnection();
+	private Connection con ;
 	private PreparedStatement psmt;
 	private ResultSet rs;
 	
@@ -24,7 +24,7 @@ public class ItemsImpl implements Items {
 	@Override
 	public List<FoodsVO> getFoods() {
 		List<FoodsVO> foodslist = new ArrayList<FoodsVO>();
-
+		con = dataSource.getConnection();
 		String sql = "SELECT * FROM foods";
 		
 		try {
@@ -48,12 +48,17 @@ public class ItemsImpl implements Items {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		return foodslist;
 	}
 
 	@Override
 	public List<KitItemsVO> getKitItems() {
+		con = dataSource.getConnection();
 		List<KitItemsVO> kititemlist = new ArrayList<KitItemsVO>();
 
 		String sql = "SELECT * FROM kititems";
@@ -79,12 +84,17 @@ public class ItemsImpl implements Items {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		return kititemlist;
 	}
 
 	@Override
 	public List<WeaponVO> getWeapons() {
+		con = dataSource.getConnection();
 		List<WeaponVO> weaponlist = new ArrayList<WeaponVO>();
 
 		String sql = "SELECT * FROM weapons";
@@ -110,7 +120,11 @@ public class ItemsImpl implements Items {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+	        if (rs != null) try { rs.close(); } catch(SQLException ex) {}
+	        if (psmt != null) try { psmt.close(); } catch(SQLException ex) {}
+	        if (con != null) try { con.close(); } catch(SQLException ex) {}
+	    }
 		return weaponlist;
 	}
 	

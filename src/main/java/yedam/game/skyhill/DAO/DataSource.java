@@ -29,7 +29,7 @@ public class DataSource {
 			Class.forName(driver);
 			con = DriverManager.getConnection(url,id,pw);
 			
-			System.out.println("DB 연동 성공");
+			//System.out.println("DB 연동 성공");
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
